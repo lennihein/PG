@@ -43,9 +43,8 @@ void main()
 c) Eigenen Signalhandler schreiben und testen (unter Linux sendet ihr
 Signals mit dem befehl kill. Siehe man kill und kill -l)
 
-d) Schreibt und erklärt ein ASM-"Hello World". Wenn ihr nicht
-weiterkommt:
-http://0xax.blogspot.com/2014/08/say-hello-to-x64-assembly-part-1.html
+d) Schreibt und erklärt ein ASM-"Hello World". <br> 
+Wenn ihr nicht weiterkommt: http://0xax.blogspot.com/2014/08/say-hello-to-x64-assembly-part-1.html
 
 
 **2)** Wiederholt / Lernt:<br>
