@@ -30,7 +30,7 @@ https://en.wikipedia.org/wiki/Inline_assembler)
 
 b) Könnt ihr erklären, was in der Main passiert? <br>
 
-```
+```C
 unsigned char shellcode[] = "...";
 void main() 
 {
