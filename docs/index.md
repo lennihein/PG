@@ -1,4 +1,3 @@
-# PG
 ## PG ITSi: ProcessInjection
 
 ---
