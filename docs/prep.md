@@ -17,7 +17,7 @@
 
 ### b)
 
-- `int (* call_shell)()` ist eine deklaration einer Funktion ohne Eingabe mit Ausgabe `int`.
+- `int (* call_shell)()` ist eine Deklaration einer Funktion ohne Eingabe mit Ausgabe `int`.
 - `int(*)()` ist der Datentyp einer Funktion ohne Eingabe mit Ausgabe `int`.
 - `shellcode` ist ein Bitmuster.
 
