@@ -136,7 +136,7 @@ _start:
 ->Ein Thread ist ein Teil eines Prozesses. Threads zum selben Prozess teilen sich den Codesegment und Datasegment.
    Mithilfe von Mutex, lassen sich Speicherzugriffe verwalten, damit die Threads nicht miteinander in Konflikte geraten.
 - Wie werden Prozesse in Linux identifiziert?  <br>
-->
+-> Jeder Prozess hat eine eindeutige Process ID (PID). Mit dem Befehl "ps" kann man die laufenden Prozesse mit ihrer PID einsehen.
 - Was ist der Zweck von clone, fork, execve?  <br>
 ->
 - Was ist ptrace? <br>
