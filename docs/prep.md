@@ -135,7 +135,8 @@ _start:
 - Was ist ein Prozess? <br>
 -> 
 - Was ist ein Thread? <br>
-->
+->Ein Thread ist ein Teil eines Prozesses. Threads zum selben Prozess teilen sich den Codesegment und Datasegment.
+   Mithilfe von Mutex, lassen sich Speicherzugriffe verwalten, damit die Threads nicht miteinander in Konflikte geraten.
 - Wie werden Prozesse in Linux identifiziert?  <br>
 ->
 - Was ist der Zweck von clone, fork, execve?  <br>
