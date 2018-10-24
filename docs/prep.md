@@ -35,8 +35,38 @@ Die gesamte Main führt also die Funktion aus, die durch das Bitmuster, welches 
 ### c)
 
 ```C
-// todo
-```
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <unistd.h>
+
+void signal_handler(int signo){//Signal handling funktion erhält ein bestimmtes signals
+	if(signo == SIGINT){
+		printf("received SIGINT\n");
+	}
+	if(signo == SIGKILL){
+		printf("received SIGKILL\n");
+	}
+	if(signo == SIGSTOP){
+		printf("received SIGSTOP\n");
+	}
+}
+
+int main(){
+	if(signal(SIGINT, signal_handler)== SIG_ERR){//signal handler funktion wird im kernel registriert
+	printf("\nsignal error\n");
+	}
+	if(signal(SIGKILL, signal_handler)== SIG_ERR){
+	printf("\nsignal error\n");
+	}
+	if(signal(SIGSTOP, signal_handler)== SIG_ERR){
+	printf("\nsignal error\n");
+	}
+	while(1){
+		sleep(1);
+	}
+	return 0;	
+}
 
 ### d)
 
