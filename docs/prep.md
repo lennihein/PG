@@ -1,4 +1,5 @@
-# PG Prep
+| <h2>[TASK](https://pg.bwuah.me/prep-task)</h2> | <h2>[SOLUTION](https://pg.bwuah.me/prep)</h2> |
+|:---:|:---:|
 
 ---
 
