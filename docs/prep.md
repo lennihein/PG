@@ -72,7 +72,6 @@ int main(){
 oder
 
 ```C
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -97,7 +96,6 @@ void sig_handler(int sig)
     printf("Caught Signal\n");
     exit(EXIT_SUCCESS);
 }
-
 ```
 
 ### d)
