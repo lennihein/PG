@@ -1,4 +1,13 @@
-| <h2>[TASK](https://pg.bwuah.me/prep-task)</h2> | <h2>[SOLUTION](https://pg.bwuah.me/prep)</h2> |
+<table>
+  <tr>
+    <th><h2> <a href="https://pg.bwuah.me/prep-task"> TASK </a> </h2></th>
+    <th> <h2> <a href="https://pg.bwuah.me/prep"> SOLUTION </a> </h2></th>
+  </tr>
+</table>
+
+---
+
+| [TASK](https://pg.bwuah.me/prep-task) | [SOLUTION](https://pg.bwuah.me/prep) |
 |:---:|:---:|
 
 ---
