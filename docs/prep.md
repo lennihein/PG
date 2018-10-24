@@ -34,8 +34,8 @@ Die gesamte Main führt also die Funktion aus, die durch das Bitmuster, welches 
 ```asm
 section .data
 
-	str: db "Hello World", 10, 0
-    str_len equ $ - str -1
+	str: db "Hello World", 10
+    str_len equ $ - str
     
 section .text
 global _start
@@ -51,6 +51,7 @@ _start:
 	mov RAX, 60
 	mov RDI, 0
 	syscall
+	
 ```
 
 ---
