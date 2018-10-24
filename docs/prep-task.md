@@ -7,11 +7,6 @@
 
 ---
 
-| [TASK](https://pg.bwuah.me/prep-task) | [SOLUTION](https://pg.bwuah.me/prep) |
-|:---:|:---:|
-
----
-
 **1)** Erinnert euch nochmal an eure C und ASM Kenntnisse und erweitert
 diese. Insbesondere sollt ihr umgehen können (d.h. Code lesen und
 produzieren) mit:
