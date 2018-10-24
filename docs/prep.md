@@ -140,4 +140,4 @@ _start:
 - Was ist der Zweck von clone, fork, execve?  <br>
 ->
 - Was ist ptrace? <br>
-->
+-> Process trace (ptrace) ist ein Linux system call, der es einem Prozess ermöglicht einen anderen Prozess zu beobachten und zu kontrollieren. Es ist dem aktiven Prozess somit möglich den Speicher und die Register des Zielprozesses zu manipulieren. Häufigster Anwendungsfall von ptrace ist bei Debuggern um z.B. breakpoints einzufügen.
