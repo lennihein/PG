@@ -131,7 +131,7 @@ _start:
 ## 2
 
 - Was ist ein Prozess? <br>
--> 
+-> Ein Prozess ist die Instanz eines Programmes. Es können mehrere Prozesse gleichzeitig zu einem Programm ausgeführt werden, die alle einen eigenes Datasegment und eigenen Stack haben.   
 - Was ist ein Thread? <br>
 ->Ein Thread ist ein Teil eines Prozesses. Threads zum selben Prozess teilen sich den Codesegment und Datasegment.
    Mithilfe von Mutex, lassen sich Speicherzugriffe verwalten, damit die Threads nicht miteinander in Konflikte geraten.
