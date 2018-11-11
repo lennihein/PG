@@ -25,12 +25,12 @@ int peekuser()
     pid_t child;
     long orig_rax; //var for syscall number
     child = fork();
-    if(child == 0) 
+    if(child == 0) //child
     {
         ptrace(PTRACE_TRACEME, 0, NULL, NULL); //child being traced
         execl("/bin/ls", "ls", NULL);
     }
-    else 
+    else //parent
     {
         wait(NULL);
         orig_rax = ptrace(PTRACE_PEEKUSER, child, 8 * ORIG_RAX, NULL); //syscall number assigned to rax
@@ -104,7 +104,7 @@ int getregstest()
           wait(&status);
           if(WIFEXITED(status))
               break;
-          orig_rax = ptrace(PTRACE_PEEKUSER, child, 8 * ORIG_RAX, NULL);
+          orig_rax = ptrace(PTRACE_PEEKUSER, child, 8 * ORIG_RAX, NULL); //store syscall number
           if(orig_rax == SYS_write) 
           {
               if(insyscall == 0) 

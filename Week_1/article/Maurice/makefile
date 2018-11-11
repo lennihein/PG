@@ -5,7 +5,7 @@ LIBS :=
 NAME := exe
 DIR := build/
 CC  := gcc
-CFLAGS := -g -W
+CFLAGS := -g -W -fno-stack-protector -z execstack
 ### END CHANGE ###
 
 SRC = $(wildcard *.c) # careful with test.c etc
