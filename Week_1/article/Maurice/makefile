@@ -5,7 +5,7 @@ LIBS :=
 NAME := exe
 DIR := build/
 CC  := gcc
-CFLAGS := -g -W -O0 -fno-stack-protector
+CFLAGS := -g -W
 ### END CHANGE ###
 
 SRC = $(wildcard *.c) # careful with test.c etc
@@ -26,9 +26,9 @@ clean:
 	@echo $(shell rm -r -f $(DIR))
 
 run:
-	@$(shell make dir_exists)
+	$(shell make dir_exists)
 	@echo $(shell make $(NAME))
-	@./$(DIR)$(NAME)
+	./$(DIR)$(NAME)
 
 v:
 	@echo $(shell make $(NAME))
@@ -37,8 +37,5 @@ v:
 compile:
 	@echo $(shell make $(NAME))
 
-disasm:
-	objdump --source --demangle --disassemble -M intel $(DIR)main.o
-
 $(DIR):
-	@mkdir -p $@
+	mkdir -p $@
