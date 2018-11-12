@@ -1,44 +1,38 @@
-.DEFAULT_GOAL := run
+.DEFAULT_GOAL := all
 
-###   CHANGE   ###
 LIBS :=
-NAME := exe
-DIR := build/
 CC  := gcc
-CFLAGS := -g -W -O0 -fno-stack-protector
-### END CHANGE ###
+CFLAGS := -g -W -O0 -fno-stack-protector -z execstack
 
-SRC = $(wildcard *.c) # careful with test.c etc
-DEPS := $(wildcard *.h)
-OBJECTS :=$(patsubst %.c,$(DIR)%.o,$(wildcard *.c))
+%.o: %.c
+	gcc -c -o $@ $^
 
-dir_exists: | $(DIR)
-	@echo 
+main: main.o
+	gcc -o $@ $^ $(CFLAS) $(LIBS)
 
-$(DIR)%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+dummy: dummy.o
+	gcc -o $@ $^ $(CFLAS) $(LIBS)
 
-$(NAME): $(OBJECTS)
-	$(CC) -o $(DIR)$@ $^ $(CFLAGS)
+all:
+	@echo $(shell make main)
+	@echo $(shell make dummy)
+	@echo $(shell make test)
 
-clean: 
-	@echo $(shell rm $(DIR)$(NAME) $(OBJECTS))
-	@echo $(shell rm -r -f $(DIR))
-
-run:
-	@$(shell make dir_exists)
-	@echo $(shell make $(NAME))
-	@./$(DIR)$(NAME)
-
-v:
-	@echo $(shell make $(NAME))
-	@echo $(shell valgrind ./$(DIR)$(NAME))
-
-compile:
-	@echo $(shell make $(NAME))
+clean: | all
+	rm *.o main dummy a.out
 
 disasm:
-	objdump --source --demangle --disassemble -M intel $(DIR)main.o
+	@objdump -S -C -d -M intel main.o
+	@echo 
+	@objdump -S -C -d -M intel dummy.o
+	@echo 
+	@objdump -S -C -d -M intel test.o
 
-$(DIR):
-	@mkdir -p $@
+test.o: test.asm
+	nasm -f elf64 test.asm
+
+test: test.o
+	ld test.o
+	
+run:
+	./main ./a.out

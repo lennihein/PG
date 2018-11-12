@@ -1,41 +1,32 @@
-.DEFAULT_GOAL := run
+.DEFAULT_GOAL := all
 
-###   CHANGE   ###
 LIBS :=
-NAME := exe
-DIR := build/
 CC  := gcc
-CFLAGS := -g -W
-### END CHANGE ###
+CFLAGS := -g -W -O0 -fno-stack-protector -z execstack
 
-SRC = $(wildcard *.c) # careful with test.c etc
-DEPS := $(wildcard *.h)
-OBJECTS :=$(patsubst %.c,$(DIR)%.o,$(wildcard *.c))
+%.o: %.c
+	gcc -c -o $@ $^
 
-dir_exists: | $(DIR)
+main: main.o
+	gcc -o $@ $^ $(CFLAS) $(LIBS)
+
+all:
+	@echo $(shell make main)
+	@echo $(shell make test)
+
+clean: | all
+	rm *.o main a.out
+
+disasm:
+	@objdump -S -C -d -M intel main.o
 	@echo 
+	@objdump -S -C -d -M intel test.o
 
-$(DIR)%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+test.o: test.asm
+	nasm -f elf64 test.asm
 
-$(NAME): $(OBJECTS)
-	$(CC) -o $(DIR)$@ $^ $(CFLAGS)
-
-clean: 
-	@echo $(shell rm $(DIR)$(NAME) $(OBJECTS))
-	@echo $(shell rm -r -f $(DIR))
-
+test: test.o
+	ld test.o
+	
 run:
-	$(shell make dir_exists)
-	@echo $(shell make $(NAME))
-	./$(DIR)$(NAME)
-
-v:
-	@echo $(shell make $(NAME))
-	@echo $(shell valgrind ./$(DIR)$(NAME))
-
-compile:
-	@echo $(shell make $(NAME))
-
-$(DIR):
-	mkdir -p $@
+	./main ./a.out
