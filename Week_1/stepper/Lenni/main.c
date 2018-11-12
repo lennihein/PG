@@ -30,6 +30,7 @@ int main ( int argc, char * argv[] )
             return 0;
         }
         ptrace(PTRACE_GETREGS, pid, NULL, &regs);
+        fprintf(stderr, "RIP = %llx\n", regs.rip);
         fprintf(stderr, "RAX = %lld,\nRDI = %lld,\nRSI = %lld,\nRDX = %lld\n\n", 
             regs.rax,
             regs.rdi, 
