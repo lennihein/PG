@@ -78,7 +78,7 @@ int peekuserdata()
                     insyscall = 0; //allows to loop back to "if part"
                 }
             }
-            ptrace(PTRACE_SYSCALL, child, NULL, NULL); //executed between if and else part
+            ptrace(PTRACE_SYSCALL, child, NULL, NULL); //continues child
         }
     }
     return 0;
