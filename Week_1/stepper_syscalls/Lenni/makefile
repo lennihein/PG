@@ -10,21 +10,15 @@ CFLAGS := -g -W -O0 -fno-stack-protector -z execstack
 main: main.o
 	gcc -o $@ $^ $(CFLAS) $(LIBS)
 
-dummy: dummy.o
-	gcc -o $@ $^ $(CFLAS) $(LIBS)
-
 all:
 	@echo $(shell make main)
-	@echo $(shell make dummy)
 	@echo $(shell make test)
 
 clean: | all
-	rm *.o main dummy a.out
+	rm *.o main a.out
 
 disasm:
 	@objdump -S -C -d -M intel main.o
-	@echo 
-	@objdump -S -C -d -M intel dummy.o
 	@echo 
 	@objdump -S -C -d -M intel test.o
 
