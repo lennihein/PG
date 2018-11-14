@@ -1,1 +1,40 @@
 ## API für MiniBug
+
+## Funktionen 
+
+- create_breakpoint
+- singlestep
+- next_syscall
+- do_instructions
+- poke_reg
+- peek_reg
+- peek_address
+- poke_address
+- view_stack(
+- continue
+
+### void create_breakpoint(?);
+
+Sets a breakpoint at the given position. 
+// todo: specify position
+
+### void singlestep();
+
+Sets a breakpoint after the next instruction (or syscall) and continues the tracee.
+
+### void next_syscall(int syscall);
+
+Sets breakpoint to the next syscall, gets ignored if this syscall is not the one specified by param. `int syscall`. If `-1` accepts all syscalls.
+
+### void do_instructions(char** instructions);
+
+Injects a payload of one or multiple instructions.
+// todo: specify format of instructions
+
+### void poke_reg(ENUM reg, unsigned long long value);
+
+Stores `value` into the specified register.
+// todo: specify enumeration
+
+### unsigned long long peek_reg(ENUM reg);
+
