@@ -6,3 +6,7 @@
 MiniBug/\.idea/
 
 MiniBug/cmake-build-debug/
+
+\.vscode/
+
+MiniBug/build/
