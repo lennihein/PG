@@ -2,3 +2,7 @@
 *.out
 
 *.o
+
+MiniBug/\.idea/
+
+MiniBug/cmake-build-debug/

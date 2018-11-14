@@ -25,6 +25,20 @@ int main()
 
     // do
 
+    char buf[2048];
+
+    memset(buf, 0, 2048);
+    read(new_sock, buf, 2048);
+    fprintf(stderr, "%s\n", buf);
+
+    memset(buf, 0, 2048);
+    read(new_sock, buf, 2048);
+    fprintf(stderr, "%s\n", buf);
+
+    memset(buf, 0, 2048);
+    read(new_sock, buf, 2048);
+    fprintf(stderr, "%s\n", buf);
+
     fprintf(stderr, "MiniBug shutting down (EXIT_SUCCESS)\n");
     return EXIT_SUCCESS;
 }

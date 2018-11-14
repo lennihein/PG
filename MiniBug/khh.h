@@ -9,4 +9,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+// misc
+#include <string.h>
+
+// defines
 #define __PORT__ 4711

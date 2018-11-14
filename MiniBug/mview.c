@@ -14,6 +14,12 @@ int main()
     // do 
     printf("err: %d\n", err);
 
+    char buf[64];
+    strncpy(buf, "Test", 4+1); // strlen("Test") + 1 for '\0'    
+    write(fd, buf, 64);
+    strncpy(buf, "Test", 4+1);
+    write(fd, buf, 64);
+
     close(fd);                                                      
     return EXIT_SUCCESS;
 }
