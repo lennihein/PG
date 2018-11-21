@@ -6,6 +6,7 @@
 #include <sys/wait.h>       // for waitpid
 #include <sys/reg.h>        // for ORIG_RAX
 #include <sys/syscall.h>    // for syscall enums
+#include <sched.h>
 
 int main ( int argc, char * argv[] )
 {
@@ -17,6 +18,7 @@ int main ( int argc, char * argv[] )
     if(!(pid = fork()))             // child
     {
         ptrace(PTRACE_TRACEME, 0, NULL, NULL);
+        sched_yield();
         execvp(argv[1], argv+1);
     } 
 

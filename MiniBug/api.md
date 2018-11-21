@@ -3,15 +3,20 @@
 ## Funktionen 
 
 - create_breakpoint
+- remove_breakpoint
 - singlestep
 - next_syscall
+- change_syscall
 - do_instructions
 - poke_reg
 - peek_reg
 - peek_address
 - poke_address
-- view_stack(
+- view_stack
 - continue
+- raise_signal
+
+step in step over?
 
 ### void create_breakpoint(?);
 

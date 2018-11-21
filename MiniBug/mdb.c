@@ -17,7 +17,7 @@ int main()
     listen(fd, 5);
     new_sock = accept(fd, (struct sockaddr *) &client_addr, &sockaddr_in_len);
     fprintf(stderr, "Received connection from %s\n", inet_ntoa(client_addr.sin_addr));
-    if(*(unsigned long*) &client_addr.sin_addr != 16777343) // 0x7F . 0x0 . 0x0 . 0x1
+    if(*(uint32_t*) &client_addr.sin_addr != 16777343) // 0x7F . 0x0 . 0x0 . 0x1
     {
         fprintf(stderr, "Not LOOPBACK\nAbort\n");
         return EXIT_FAILURE;
