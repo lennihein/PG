@@ -1,0 +1,18 @@
+<% include partials/header %>
+    <h1>Insert String</h1>
+    <p>Insert any String and it will be reversed...</p>
+
+    <form action="/action.php" onsubmit="reverseString()">
+      Enter String: <input type="text" name="input">
+      <input type="submit" value="Submit">
+    </form>
+    
+    <script>
+    function reverseString(str) {
+    var splitString = str.split(""); //string to array
+    var reverseArray = splitString.reverse(); //reverse array
+    var joinArray = reverseArray.join(""); //array to string
+    alert(joinArray);
+}
+    </script>
+<% include partials/footer %>
