@@ -1,24 +1,10 @@
 #include "khh.h"
 
-// TODO: clean up this whole code
+int init_net();
 
 int main()
 {
-    int err, fd;    
-    struct sockaddr_un dest;
-
-    fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    dest.sun_family = AF_UNIX;
-    *(dest.sun_path) = 'x';
-    strncpy( dest.sun_path, __SOCKET_PATH__, strlen(__SOCKET_PATH__) + 1);
-    socklen_t sockaddr_un_len = strlen(dest.sun_path) + sizeof(dest.sun_family);
-
-    fprintf(stderr, "PATH: %s\n", dest.sun_path);
-
-    err = connect(fd, (struct sockaddr*) &dest, sizeof(struct sockaddr_un));
-
-    // do 
-    printf("err: %d\n", err);
+    int fd = init_net();
 
     char buf[__MSG_SIZE__];
 
@@ -32,4 +18,20 @@ int main()
 
     close(fd);                                                      
     return EXIT_SUCCESS;
+}
+
+int init_net()
+{
+    int err, fd;    
+    struct sockaddr_un dest;
+
+    fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    assert(fd!=-1, "Socket Creation Failed");
+    dest.sun_family = AF_UNIX;
+    strncpy( dest.sun_path, __SOCKET_PATH__, strlen(__SOCKET_PATH__) + 1);
+    socklen_t sockaddr_un_len = strlen(dest.sun_path) + sizeof(dest.sun_family);
+    err = connect(fd, (struct sockaddr*) &dest, sizeof(struct sockaddr_un));
+    assert(err != -1, "Connect failed");
+
+    return fd;
 }
