@@ -16,13 +16,16 @@ int main()
     char buf[__MSG_SIZE__];    
     memset(buf, 0, __MSG_SIZE__);
     read(fd, buf, __MSG_SIZE__);
-    fprintf(stdout, "%s\n", buf);
-    fprintf(stdout, "writing: ... ");
+    printf("%s\n", buf);
+    printf("writing: ... ");
     strncpy(buf, "Hella", 5);
     write(fd, buf, 10);
-    fprintf(stdout, "done\n");
+    printf("done\n");
     memset(buf, 0, __MSG_SIZE__);
     read(fd, buf, __MSG_SIZE__);
+    printf("%s\n", buf);
+
+    // assert_soft(0, "test");
 
     fprintf(stderr, "MiniBug shutting down (EXIT_SUCCESS)\n");
     unlink(__SOCKET_PATH__);
