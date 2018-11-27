@@ -10,10 +10,8 @@ int main()
     memset(buf, 0, __MSG_SIZE__);
     read(fd, buf, __MSG_SIZE__);
     printf("%s\n", buf);
-    printf("writing: ... ");
     strncpy(buf, "Hella", 5);
     write(fd, buf, 10);
-    printf("done\n");
     memset(buf, 0, __MSG_SIZE__);
     read(fd, buf, __MSG_SIZE__);
     printf("%s\n", buf);
@@ -33,11 +31,7 @@ int init_net()
 
     sockaddr_un_len = sizeof(struct sockaddr_un);
     socket_fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if(socket_fd < 0)
-    {
-        fprintf(stdout, "Error creating socket\n"); 
-        exit(EXIT_FAILURE);
-    }
+    assert(socket_fd != -1, "Socket Creation Failed");
     server_addr.sun_family = AF_UNIX;
     strncpy(server_addr.sun_path, __SOCKET_PATH__, strlen(__SOCKET_PATH__) + 1);
     sockaddr_un_len = strlen(server_addr.sun_path) + sizeof(server_addr.sun_family);
@@ -47,15 +41,19 @@ int init_net()
     assert_soft(err, "Socket File does exist! Unlinking ... ");
     if(!err) unlink(__SOCKET_PATH__);           // unlinking in order to rebind
 
-    if(bind(socket_fd, (struct sockaddr *) &server_addr, sockaddr_un_len) < 0)
-    {
-       fprintf(stdout, "Error binding socket\n"); 
-       exit(EXIT_FAILURE);
-    }
-    fprintf(stdout, "listening: ..");
-    listen(socket_fd, 5);
+    err = bind(socket_fd, (struct sockaddr *) &server_addr, sockaddr_un_len);
+    assert(err != -1, "Bind failed");
+
+    printf("listening: ..");
+
+    err = listen(socket_fd, 5);
+    assert(err != -1, "Listen failed");
+
     fd = accept(socket_fd, (struct sockaddr *) &client_addr, &sockaddr_un_len);  
-    fprintf(stdout, ".. Connection established\n");
+    assert(fd != -1, "Accept failed");
+
+    printf(".. Connection established\n");
+
     return fd;
 }
 

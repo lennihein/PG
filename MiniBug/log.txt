@@ -1,4 +1,0 @@
-listening: .... Connection established
-Test
-writing: ... done
-Test
