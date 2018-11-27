@@ -1,5 +1,7 @@
 #include "khh.h"
 
+// TODO: clean up this whole code
+
 int main()
 {
     int err, fd;    
@@ -18,15 +20,15 @@ int main()
     // do 
     printf("err: %d\n", err);
 
-    char buf[64];
+    char buf[__MSG_SIZE__];
 
     strncpy(buf, "Test", 4+1);    
-    write(fd, buf, 64);
+    write(fd, buf, __MSG_SIZE__);
 
-    read(fd, buf, 64);
+    read(fd, buf, __MSG_SIZE__);
 
     strncpy(buf, "Test", 4+1);
-    write(fd, buf, 64);
+    write(fd, buf, __MSG_SIZE__);
 
     close(fd);                                                      
     return EXIT_SUCCESS;
