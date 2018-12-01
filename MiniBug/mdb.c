@@ -5,18 +5,14 @@ int main()
     fprintf(stderr, "MiniBug service started\n");
     init_log();
     int fd = init_net();
+    int err;
 
     char buf[__MSG_SIZE__];    
     memset(buf, 0, __MSG_SIZE__);
-    read(fd, buf, __MSG_SIZE__);
+    err = read(fd, buf, __MSG_SIZE__);
+    assert(err >= 0, "read unsuccessful");
     printf("%s\n", buf);
-    strncpy(buf, "Hella", 5);
-    write(fd, buf, 10);
-    memset(buf, 0, __MSG_SIZE__);
-    read(fd, buf, __MSG_SIZE__);
-    printf("%s\n", buf);
-
-    // assert_soft(0, "test");
+    init_trace(buf);
 
     fprintf(stderr, "MiniBug shutting down (EXIT_SUCCESS)\n");
     unlink(__SOCKET_PATH__);    // free up file for further use on next startup
@@ -55,6 +51,11 @@ int init_net()
     printf(".. Connection established\n");
 
     return fd;
+}
+
+void init_trace(char* str)
+{
+    
 }
 
 void init_log()

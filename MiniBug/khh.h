@@ -23,7 +23,19 @@
 #define __SOCKET_PATH__ "tmp_sock"
 #define __MSG_SIZE__ 64
 
-// assert
+/* assert
+
+Assertions
+
+void assert(expr, char* msg);
+void assert_soft(expr, char* msg);
+
+assert() checks `expr`, if the expression is `false` assert() will produce output on the stderr, including `msg`.
+assert() will then exit the program with `EXIT_FAILURE`, assert_soft() will only produce the warning.
+
+Attention: side effects in assert() will take place, e.g. `assert(++i == 0, "");` will increment i regardless of check.
+
+*/
 #define assert(expr, msg) \
     if (!(expr)) \
         __assertion_failed__(__FILE__, __LINE__, msg, 1)
