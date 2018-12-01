@@ -20,34 +20,39 @@
 // misc
 #include <string.h>
 #include <sys/wait.h>       // waitpid
+#include <signal.h>
 
 // defines
 #define __PORT__ 4711
 #define __SOCKET_PATH__ "tmp_sock"
-#define __MSG_SIZE__ 64
 
-/* assert
+#include "assertion.h"
 
-Assertions
-
-void assert(expr, char* msg);
-void assert_soft(expr, char* msg);
-
-assert() checks `expr`, if the expression is `false` assert() will produce output on the stderr, including `msg`.
-assert() will then exit the program with `EXIT_FAILURE`, assert_soft() will only produce the warning.
-
-Attention: side effects in assert() will take place, e.g. `assert(++i == 0, "");` will increment i regardless of check.
-
-*/
-#define assert(expr, msg) \
-    if (!(expr)) \
-        __assertion_failed__(__FILE__, __LINE__, msg, 1)
-    
-#define assert_soft(expr, msg) if(!(expr))__assertion_failed__(__FILE__,__LINE__,msg,0)
-
-void __assertion_failed__(char* file, int line, char* msg, int do_exit)
-{
-    fprintf(stderr,         "ASSERT%s: %s : %i\n", do_exit?"  ":"(soft)", file, line);
-    if(msg) fprintf(stderr, "MESSAGE%s: %s\n", do_exit?" ":"     ",msg);
-    if(do_exit) exit(EXIT_FAILURE);
-}
+// registers
+# define R15	    8*00
+# define R14	    8*01
+# define R13	    8*02
+# define R12	    8*03
+# define RBP	    8*04
+# define RBX	    8*05
+# define R11	    8*06
+# define R10	    8*07
+# define R9	        8*08
+# define R8	        8*09
+# define RAX	    8*10
+# define RCX	    8*11
+# define RDX	    8*12
+# define RSI	    8*13
+# define RDI	    8*14
+# define ORIG_RAX   8*15
+# define RIP	    8*16
+# define CS	        8*17
+# define EFLAGS	    8*18
+# define RSP	    8*19
+# define SS	        8*20
+# define FS_BASE    8*21
+# define GS_BASE    8*22
+# define DS	        8*23
+# define ES	        8*24
+# define FS	        8*25
+# define GS	        8*26

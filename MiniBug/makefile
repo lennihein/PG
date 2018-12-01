@@ -9,14 +9,15 @@ DEPS := $(wildcard *.h)
 
 dir_exists: | $(DIR)
 
-%.o: %.c
-	@gcc -c -o $(DIR)$@ $^ $(CFLAGS) $(LIBS)
+$(DIR)%.o: %.c
+	@gcc -c -o $@ $^ $(CFLAGS) $(LIBS)
 
-compile_mdb: mdb.o
-	@gcc -o $(DIR)mdb $(DIR)$^ $(CFLAGS) $(LIBS)
+# todo: OBJECTS PATSUBST
+compile_mdb: $(DIR)mdb.o $(DIR)functions.o $(DIR)assertion.o
+	@gcc -o $(DIR)mdb $^ $(CFLAGS) $(LIBS)
 
-compile_mview: mview.o
-	@gcc -o $(DIR)mview $(DIR)$^ $(CFLAGS) $(LIBS)
+compile_mview: $(DIR)mview.o $(DIR)assertion.o
+	@gcc -o $(DIR)mview $^ $(CFLAGS) $(LIBS)
 
 clean: | compile_all
 	@rm -r -f $(DIR)
@@ -24,8 +25,6 @@ clean: | compile_all
 mdb: | compile_mdb
 	@./$(DIR)mdb
 	
-# @rm tmp_sock	# existence of tmp_sock creates problems with binding a berkeley socket
-
 mview: | compile_mview
 	@./$(DIR)mview
 
