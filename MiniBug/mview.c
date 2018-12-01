@@ -8,13 +8,13 @@ int main()
 
     char buf[__MSG_SIZE__];
 
-    strncpy(buf, "Test", 4+1);    
+    // asking server to trace "touch test.txt"
+    strncpy(buf, "touch test.txt", __MSG_SIZE__);    
     write(fd, buf, __MSG_SIZE__);
 
+    // awaiting confirmation from server
     read(fd, buf, __MSG_SIZE__);
-
-    strncpy(buf, "Test", 4+1);
-    write(fd, buf, __MSG_SIZE__);
+    assert(!strcmp("successful", buf), "Server creating tracee was unsuccessful");
 
     close(fd);                                                      
     return EXIT_SUCCESS;

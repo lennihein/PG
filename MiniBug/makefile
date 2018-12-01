@@ -23,6 +23,8 @@ clean: | compile_all
 
 mdb: | compile_mdb
 	@./$(DIR)mdb
+	
+# @rm tmp_sock	# existence of tmp_sock creates problems with binding a berkeley socket
 
 mview: | compile_mview
 	@./$(DIR)mview

@@ -11,12 +11,15 @@
 #include <arpa/inet.h>
 
 // UNIX
-#include <sys/un.h>
-
+#include <sys/un.h>         // def. of `sockaddr_un`
 #include <unistd.h>
+
+// ptrace
+#include <sys/ptrace.h>
 
 // misc
 #include <string.h>
+#include <sys/wait.h>       // waitpid
 
 // defines
 #define __PORT__ 4711

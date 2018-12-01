@@ -10,9 +10,14 @@ int main()
     char buf[__MSG_SIZE__];    
     memset(buf, 0, __MSG_SIZE__);
     err = read(fd, buf, __MSG_SIZE__);
-    assert(err >= 0, "read unsuccessful");
+    assert(err == __MSG_SIZE__, "read unsuccessful");
     printf("%s\n", buf);
-    init_trace(buf);
+    pid_t pid = init_tracee(buf);
+    // tracee now created and traced
+
+    strncpy(buf, "successful", __MSG_SIZE__);
+    write(fd, buf, __MSG_SIZE__);
+    // client notified
 
     fprintf(stderr, "MiniBug shutting down (EXIT_SUCCESS)\n");
     unlink(__SOCKET_PATH__);    // free up file for further use on next startup
@@ -53,9 +58,47 @@ int init_net()
     return fd;
 }
 
-void init_trace(char* str)
+pid_t init_tracee(char* str)
 {
-    
+    //convert string to tokens
+    int counter = 1;
+    for(int i = 0; str[i] != 0x0; i++)
+    {
+        if(str[i] == 32) counter++;
+    }
+    char** tokens = malloc(sizeof(void*) * counter);
+    counter = 0;
+    tokens[0] = str+counter;
+    for(int i = 0; str[i] != 0x0; i++)
+    {
+        if(str[i] == 32) 
+        {
+            tokens[++counter] = str+i+1;
+            str[i] = 0x0;
+        }
+    }
+
+    fprintf(stderr, "%s", tokens[0]);
+
+    // create tracee
+    pid_t pid;
+    int status, err;
+    pid = fork();
+    assert(pid != -1, "fork failed");
+
+    if(!(pid)) // child
+    {
+        ptrace(PTRACE_TRACEME, 0, NULL, NULL);
+        // close(STDOUT_FILENO);
+        err = execvp(tokens[0], tokens);
+        exit(EXIT_FAILURE);
+    } 
+
+    // wait for tracee
+    waitpid(pid, &status, 0);
+    assert(!WIFEXITED(status), "execvp() failed");
+    printf("Tracee created, traced, and interrupted\n");
+    return pid;
 }
 
 void init_log()
@@ -67,4 +110,5 @@ void init_log()
     fclose(log_out);    // closing stream
     close(log_fd);      // closing File Descriptor
                         // only stdout is open, and leads towards log.txt
+    printf("Log output redirected\n");
 }
