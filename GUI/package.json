@@ -7,9 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "body-parser": "*",
+    "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
-    "express": "*"
+    "express": "^4.16.4"
   },
   "author": "Maurice",
   "license": "ISC"
