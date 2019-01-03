@@ -1,18 +1,24 @@
-<% include partials/header %>
-    <h1>Insert String</h1>
-    <p>Insert any String and it will be reversed...</p>
-
-    <form action="/action.php" onsubmit="reverseString()">
-      Enter String: <input type="text" name="input">
-      <input type="submit" value="Submit">
-    </form>
+<% include header %>
+<body>
+    <h1><%= topicHead %></h1>
+    <form name="form1" method="POST" action="/reverse">
+    <table>
+        <tr>
+        <td>First String</td>
+        <td><input type="text" name="fstring" ></td>
+        </tr>
+        <tr>
+        <td>last String</td>
+        <td><input type="text" name="lstring" ></td>
+        </tr>
+        <tr>
+        <td colspan="2"><input type="submit" value="Save" ></td>
+        </tr>
+    </table>
     
-    <script>
-    function reverseString(str) {
-    var splitString = str.split(""); //string to array
-    var reverseArray = splitString.reverse(); //reverse array
-    var joinArray = reverseArray.join(""); //array to string
-    alert(joinArray);
-}
-    </script>
-<% include partials/footer %>
+    </form>   
+    <% if(userValue!=null){ %>    
+        <div> Reversed String: <%= userValue.first %>  <%= userValue.last %> </div>
+    <%}%> 
+</body>
+<% include footer %>
