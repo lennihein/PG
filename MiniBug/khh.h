@@ -56,3 +56,6 @@
 # define ES	        8*24
 # define FS	        8*25
 # define GS	        8*26
+
+// todo: define more syscalls
+#define SYS_WRITE   1

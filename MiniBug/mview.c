@@ -1,24 +1,28 @@
 #include "functions.h"
 
-int init_net();
+int init_net(char* exec_path);
+void stop(pid_t pid);
 
 int main()
 {
-    int fd = init_net();
+    int fd = init_net("tools/hello_world");
     REQUEST req;
-    char buf[__MSG_SIZE__];
 
-    // asking server to trace "touch test.txt"
-    strncpy(buf, "tools/hello_world", __MSG_SIZE__);
-    write(fd, buf, __MSG_SIZE__);
-
-    // awaiting confirmation from server
-    read(fd, buf, __MSG_SIZE__);
-    assert(!strcmp("successful", buf), "Server creating tracee was unsuccessful");
-
-    loop:
+    // next_syscall(SYS_WRITE)
     req.control = __CMD__;
-    req.value = __PEEK_REG__;    
+    req.value = __NEXT_SYSCALL__;
+    write(fd, &req, __REQ_SIZE__);
+    read(fd, &req, __REQ_SIZE__);
+    assert(req.control ==  __RECEIVED__, "");
+    req.control = __VALUE__;
+    req.value = SYS_WRITE;
+    write(fd, &req, __REQ_SIZE__);
+    read(fd, &req, __REQ_SIZE__);
+    assert(req.control == __VALUE__ && req.value == __ANY__, "");
+
+    // peek_reg(RAX)
+    req.control = __CMD__;
+    req.value = __PEEK_REG__;
     write(fd, &req, __REQ_SIZE__);
     read(fd, &req, __REQ_SIZE__);
     assert(req.control ==  __RECEIVED__, "");
@@ -26,24 +30,16 @@ int main()
     req.value = RAX;
     write(fd, &req, __REQ_SIZE__);
     read(fd, &req, __REQ_SIZE__);
-    printf("RAX: %lu\n", req.value);
-    printf("more? (y/n)");
-    scanf("%s", buf);
-    if(strcmp(buf, "y") == 0) goto loop;
+    printf("Number of printed characters %lu\n", req.value);
 
-    req.control = __CMD__;
-    req.value = __EXIT__;
-    print_bytes(&req, __REQ_SIZE__);
-    write(fd, &req, __REQ_SIZE__);
-
-    close(fd);
+    stop(fd);
     return EXIT_SUCCESS;
 }
 
 /* fixme sockaddr_un_len is never used,
  * fixme do we need to use it instead of sizeof(struct sockaddr_un)?
  */
-int init_net()
+int init_net(char* exec_path)
 {
     int err, fd;
     struct sockaddr_un dest;
@@ -56,5 +52,24 @@ int init_net()
     err = connect(fd, (struct sockaddr *) &dest, sizeof(struct sockaddr_un));
     assert(err != -1, "Connect failed");
 
+    char buf[__MSG_SIZE__];
+
+    // asking server to trace "touch test.txt"
+    strncpy(buf, exec_path, __MSG_SIZE__);
+    write(fd, buf, __MSG_SIZE__);
+
+    // awaiting confirmation from server
+    read(fd, buf, __MSG_SIZE__);
+    assert(!strcmp("successful", buf), "Server creating tracee was unsuccessful");
+
     return fd;
+}
+
+void stop(pid_t fd)
+{
+    REQUEST req;
+    req.control = __CMD__;
+    req.value = __EXIT__;
+    write(fd, &req, __REQ_SIZE__);
+    close(fd);
 }

@@ -53,6 +53,7 @@ void debug_loop(pid_t pid, int fd)
     {
         case __EXIT__:                                  goto exit;
         case __PEEK_REG__:      peek_reg(pid, fd);      break;
+        case __NEXT_SYSCALL__:  next_syscall(pid, fd);  break;
 
         default:                printf("> unrecognised command .. awaiting another\n");
                                 req.control = __UNRECOGN__;
