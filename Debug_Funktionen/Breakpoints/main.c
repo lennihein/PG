@@ -82,7 +82,7 @@ int main(int argc, char * argv[])
 	//int status2 =0;
 	
 	char code[]={
-		0xcd,0x80,	//int 80
+		0x90, 0x90,	//NOP, NOP
 		0xcc	 	//int3
 	};
 	char backup[8];
