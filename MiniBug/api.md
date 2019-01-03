@@ -7,7 +7,6 @@
 - remove_breakpoint
 - singlestep
 - next_syscall
-- change_syscall
 - do_instructions
 - poke_reg
 - peek_reg
