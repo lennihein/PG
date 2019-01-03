@@ -3,6 +3,7 @@
 ## Funktionen 
 
 - create_breakpoint
+- show breakpoints
 - remove_breakpoint
 - singlestep
 - next_syscall
