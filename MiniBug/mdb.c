@@ -137,9 +137,21 @@ pid_t init_tracee(char *str)
         exit(EXIT_FAILURE);
     }
 
-    // wait for tracee
+    // wait for sys 14
+    // waitpid(pid, &status, 0);
+    // assert(!WIFEXITED(status), "sys 14 failed");
+    // ptrace(PTRACE_SYSCALL, pid, 0,0);
+    // waitpid(pid, &status, 0);
+    // assert(!WIFEXITED(status), "sys 14 failed");
+    // ptrace(PTRACE_SYSCALL, pid, 0,0);
+
+    // wait for execvp
     waitpid(pid, &status, 0);
     assert(!WIFEXITED(status), "execvp() failed");
+    ptrace(PTRACE_SYSCALL, pid, 0,0);
+    waitpid(pid, &status, 0);
+    assert(!WIFEXITED(status), "execvp() failed");
+
     printf("> Tracee created, traced, and interrupted\n");
     return pid;
 }

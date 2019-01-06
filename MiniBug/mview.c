@@ -3,34 +3,27 @@
 int init_net(char* exec_path);
 void stop(pid_t pid);
 
+int64_t __peek_reg__(pid_t pid, int16_t reg);
+void __next_syscall__(pid_t pid, int16_t syscall);
+
 int main()
 {
     int fd = init_net("tools/hello_world");
     REQUEST req;
 
-    // next_syscall(SYS_WRITE)
-    req.control = __CMD__;
-    req.value = __NEXT_SYSCALL__;
-    write(fd, &req, __REQ_SIZE__);
-    read(fd, &req, __REQ_SIZE__);
-    assert(req.control ==  __RECEIVED__, "");
-    req.control = __VALUE__;
-    req.value = SYS_WRITE;
-    write(fd, &req, __REQ_SIZE__);
-    read(fd, &req, __REQ_SIZE__);
-    assert(req.control == __VALUE__ && req.value == __ANY__, "");
+    uint64_t orig_rax, rax, rsp, rbp, rip;
 
-    // peek_reg(RAX)
-    req.control = __CMD__;
-    req.value = __PEEK_REG__;
-    write(fd, &req, __REQ_SIZE__);
-    read(fd, &req, __REQ_SIZE__);
-    assert(req.control ==  __RECEIVED__, "");
-    req.control = __VALUE__;
-    req.value = RAX;
-    write(fd, &req, __REQ_SIZE__);
-    read(fd, &req, __REQ_SIZE__);
-    printf("Number of printed characters %lu\n", req.value);
+    loop:
+
+        orig_rax = __peek_reg__(fd, ORIG_RAX);
+        rax = __peek_reg__(fd, RAX);
+        rsp = __peek_reg__(fd, RSP);
+        rbp = __peek_reg__(fd, RBP);
+        rip = __peek_reg__(fd, RIP);
+        printf("ORIG_RAX: %lu\nRAX: %lu\nRSP: %lu\nRBP: %lu\nRIP: %lu\n\n", orig_rax, rax, rsp, rbp, rip);
+        __next_syscall__(fd, -1); 
+
+    goto loop;
 
     stop(fd);
     return EXIT_SUCCESS;
@@ -72,4 +65,39 @@ void stop(pid_t fd)
     req.value = __EXIT__;
     write(fd, &req, __REQ_SIZE__);
     close(fd);
+}
+
+int64_t __peek_reg__(pid_t fd, int16_t reg)
+{
+    REQUEST req;
+    req.control = __CMD__;
+    req.value = __PEEK_REG__;
+    write(fd, &req, __REQ_SIZE__);
+    read(fd, &req, __REQ_SIZE__);
+    assert(req.control ==  __RECEIVED__, "");
+    req.control = __VALUE__;
+    req.value = reg;
+    write(fd, &req, __REQ_SIZE__);
+    read(fd, &req, __REQ_SIZE__);
+    return req.value;
+}
+
+void __next_syscall__(pid_t fd, int16_t syscall)
+{
+    REQUEST req;
+    req.control = __CMD__;
+    req.value = __NEXT_SYSCALL__;
+    write(fd, &req, __REQ_SIZE__);
+    read(fd, &req, __REQ_SIZE__);
+    assert(req.control ==  __RECEIVED__, "");
+    req.control = __VALUE__;
+    req.value = syscall;
+    write(fd, &req, __REQ_SIZE__);
+    read(fd, &req, __REQ_SIZE__);
+    if(req.value == __EXIT__)
+    {
+        printf("Tracee terminated\n");
+        exit(0);
+    }
+    assert(req.control == __VALUE__ && req.value == __ANY__, "");
 }
