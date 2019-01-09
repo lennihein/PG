@@ -15,4 +15,4 @@
 | ASLR                            	| Welche Adresse                                  	|      	|       	|       	|
 | Proof of concept                	| Git commit                                      	|      	|       	|       	|
 | ?                               	| PTRACE_SYSCALL-Anomalie -> wohin?               	|      	|       	|       	|
-| Ausblick und Stand              	| Strucktur                                       	|      	|       	|       	|
+| Ausblick und Stand              	| Struktur                                        	|      	|       	|     yes	|
