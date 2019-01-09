@@ -10,7 +10,7 @@
 | Breakpoints                     	| mehrere, sonstige int3, RIP vergleichen?        	|      	|      high 	|       	|
 |                                   |                                                   |       |          |         |
 | Code injizieren                 	| ALLES                                           	|    Kaywan  	|     high  	|       	|
-| Signale                         	|  Unerwartete Signale? 	                          |   Kaywan   	|    high   	|       	|
+| Signale                         	|  Unerwartete Signale? 	                          |   Kaywan   	|    low   	|       	|
 |                                   |                                                   |       |          |         |
 | Proof of concept                	| Git commit                                      	|      	|    high   	|       	|
 |                                   |                                                   |       |          |         |
