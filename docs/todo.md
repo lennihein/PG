@@ -15,7 +15,7 @@
 | Proof of concept                	| Git commit                                      	|      	|    high   	|   yes    	|
 |                                   |                                                   |       |          |         |
 | Speicher auslesen und verändern 	| Sprache                                         	|      	|     low  	|    yes   	|
-| Breakpoints                     	| Endian Padding?                                 	|    Lenni  	|     low  	|       	|
+| Breakpoints                     	| Endian Padding?                                 	|    Lenni  	|     low  	|    yes   	|
 | Singlestep                      	| Details im manual                               	|      	|      low 	|    yes   	|
 | Systemcalls                     	| Details im manual                               	|      	|     low  	|    yes   	|
 | ?                               	| PTRACE_SYSCALL-Anomalie -> wohin?               	|      	|      low 	|    yes   	|
