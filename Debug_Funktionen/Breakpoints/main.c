@@ -8,86 +8,58 @@
 #include <unistd.h>
 #include <string.h>
 #include <syscall.h>
+#include <stdint.h>
 
+# define R15	    8*00
+# define R14	    8*01
+# define R13	    8*02
+# define R12	    8*03
+# define RBP	    8*04
+# define RBX	    8*05
+# define R11	    8*06
+# define R10	    8*07
+# define R9	        8*08
+# define R8	        8*09
+# define RAX	    8*10
+# define RCX	    8*11
+# define RDX	    8*12
+# define RSI	    8*13
+# define RDI	    8*14
+# define ORIG_RAX   8*15
+# define RIP	    8*16
+# define CS	        8*17
+# define EFLAGS	    8*18
+# define RSP	    8*19
+# define SS	        8*20
+# define FS_BASE    8*21
+# define GS_BASE    8*22
+# define DS	        8*23
+# define ES	        8*24
+# define FS	        8*25
+# define GS	        8*26
 
 const int long_size=sizeof(long);
-// pid -> child , addr ->aktuelles rip, *str ->pointer wohin gespeichert werden soll, len -> länge bis wohin gelesen und gespeichert wird
-void getdata(pid_t pid, long addr, char *str, int len)
+
+void print_bytes(void *ptr, int size)
 {
-	char *laddr;
-	int i ,j;
-	union u
-	{
-		long val;
-		char chars[long_size];
-	}data;//speicher für gelesene datein unter linux eine union datei
-		
-	i=0;
-	j=len/long_size; //const wie viel gelesen werden soll bzw wie häufig wiederholt werden muss
-	laddr = str;
-		
-	while(i<j)
-	{
-		data.val= ptrace(PTRACE_PEEKDATA, pid, addr +i*8, NULL);//  8 bytes auslesen und in data.val abspeichern
-		memcpy(laddr, data.chars, long_size); // copieren von zwischenspeicher nach pointer laddr
-		++i;
-		laddr += long_size; //pointer von laddr weiter verschieben-> weil ziel ort im speicher zusammenhängend
-	}
-	j=len % long_size;// falls weniger als 1byte übertragen werden muss
-		
-	if(j!=0)
-	{
-		data.val= ptrace(PTRACE_PEEKDATA, pid, addr +i*8, NULL);
-		memcpy(laddr, data.chars, j);
-	}
-	str[len] = '\0'; //?
+    unsigned char *p = ptr;
+    int i;
+    for (i=0; i<size; i++) {
+        printf("0x%02hhX ", p[i]);
+    }
+    printf("\n");
 }
-
-void putdata(pid_t pid, long addr, char *str, int len)
-{
-	char *laddr;
-	int i ,j;
-	union u
-	{
-		long val;
-		char chars[long_size];
-	}data;//speicher von gelesene datein
-				
-	i=0;
-	j=len/long_size;
-	laddr = str;
-	while(i<j)
-	{
-		memcpy(data.chars, laddr, long_size);
-		ptrace(PTRACE_POKEDATA, pid, addr +i*8, data.val);
-		++i;
-		laddr += long_size;
-	}
-	j=len%long_size;
-	if(j!=0)
-	{
-		memcpy(data.chars, laddr, j);
-		ptrace(PTRACE_POKEDATA, pid, addr +i*8, data.val);
-	}	
-}
-
-
-
 
 int main(int argc, char * argv[])
 {
+	uint64_t rip, rax, rsp, rbp, content;
 	pid_t child;
-	struct user_regs_struct regs,regs2;
+	struct user_regs_struct regs;
 	int status;
-	//int status2 =0;
-	
-	char code[]={
-		0x90, 0x90,	//NOP, NOP
-		0xcc	 	//int3
-	};
-	char backup[8];
-	child=fork();
-	if(child==0)
+	child = fork();
+	pid_t pid = child;
+	if(child == -1) {exit(1);}
+	if(child ==  0)
 	{
 		if(ptrace(PTRACE_TRACEME, 0, NULL, NULL))
 		{
@@ -99,49 +71,78 @@ int main(int argc, char * argv[])
 	}
 	else{
 		wait(NULL);
-		ptrace(PTRACE_GETREGS, child, NULL, &regs);
-		
-								ptrace(PTRACE_GETREGS, child, NULL, &regs2);
-								fprintf(stderr, "RIP= %llx\n", regs2.rip);
-								fprintf(stderr, "RAX = %lld,\nRDI= %lld,\nRSI= %lld,\nRDX= %lld\n\n",regs2.rax,regs2.rdi,regs2.rsi,regs2.rdx);
-								
-								
-								ptrace(PTRACE_GETREGS, child, NULL, &regs);
-								fprintf(stderr, "RIP= %llx\n", regs.rip);
-								fprintf(stderr, "RAX = %lld,\nRDI= %lld,\nRSI= %lld,\nRDX= %lld\n\n",regs.rax,regs.rdi,regs.rsi,regs.rdx);
-		//data bereich holen
-		getdata(child, regs.rip, backup, 8); // hier bei der 2. eingabe ist die eingabe einer beliebigen addresse möglich !
-		// auch wichtig ist das die abglesenen bytes 8 sind wegen 64bit ! und nicht nur die länge des später hinzugefügten bereichs!!
-		//trap funktion --> break einfügen
-		putdata(child, regs.rip, code, 3);
-		
-		ptrace(PTRACE_CONT, child, NULL, NULL);//child soll trap funktion ausführen
-		
-		//Trapfunktion ausgeführt parent erhällt kontrolle
-		wait(NULL);
-								ptrace(PTRACE_GETREGS, child, NULL, &regs2);
-								fprintf(stderr, "RIP= %llx\n", regs2.rip);
-								fprintf(stderr, "RAX = %lld,\nRDI= %lld,\nRSI= %lld,\nRDX= %lld\n\n",regs2.rax,regs2.rdi,regs2.rsi,regs2.rdx);
-		printf("Breakpoint wurde erreicht, zum fortfahren [beliebige Taste] druecken");
-		
-		getchar(); 
-		
-		//trapfunktion mit backup wieder überschreiben
-		putdata(child, regs.rip, backup, 8);
-		ptrace(PTRACE_SETREGS, child, NULL, &regs);
-		
-		ptrace(PTRACE_SINGLESTEP, child, NULL, NULL);// evt auch ptrace_cont -- hier nur singlestep zum überprüfen der ausgabe
-		loop:
-			waitpid(child,&status,0);
-								ptrace(PTRACE_GETREGS, child, NULL, &regs2);
-								fprintf(stderr, "RIP= %llx\n", regs2.rip);
-								fprintf(stderr, "RAX = %lld,\nRDI= %lld,\nRSI= %lld,\nRDX= %lld\n\n",regs2.rax,regs2.rdi,regs2.rsi,regs2.rdx);
-			if(WIFEXITED(status))
-			{
-				return 0;
-			}
-			ptrace(PTRACE_SINGLESTEP, child, 0,0);
 
-		goto loop;
+		uint64_t* code = malloc(8);
+		memset(code, 0x90, 8);
+		*((uint8_t*) code) = 0xcc;
+		int shellcode_len = 8;
+		uint64_t* backup = malloc(shellcode_len);
+
+		// print rip
+		rip = ptrace(PTRACE_PEEKUSER, pid, RIP, 0);		
+		fprintf(stderr, "rip= %lu\n", rip);
+
+		// save rip as 'addr'
+		uint64_t addr = rip;
+
+		fprintf(stderr, "\ndata bereich holen\n\n");
+		for(int i = 0; i < shellcode_len; i+=8)
+		{
+			backup[i] = ptrace(PTRACE_PEEKDATA, pid, addr + i, NULL);
+		}
+
+		fprintf(stderr, "\ncode\n");
+		print_bytes(code, 8);
+		fprintf(stderr, "\nbackup\n");
+		print_bytes(backup, 8);
+
+		fprintf(stderr, "\ncode laden\n");
+		for(int i = 0; i < shellcode_len; i+=8)
+		{
+			ptrace(PTRACE_POKEDATA, pid, addr + i, code[i]);
+		}
+
+		fprintf(stderr, "\nbytes at addr are:\n");
+		content = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
+		print_bytes(&content, 8);
+				
+		fprintf(stderr, "\ncont\n");		
+		ptrace(PTRACE_CONT, child, NULL, NULL);
+		
+		wait(NULL);
+		
+		// breakpoint 
+		getchar();
+		
+		fprintf(stderr, "\nbytes at addr are:\n");
+		content = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
+		print_bytes(&content, 8);
+
+		//trapfunktion mit backup wieder überschreiben
+		for(int i = 0; i < shellcode_len; i+=8)
+		{
+			ptrace(PTRACE_POKEDATA, pid, addr + i, backup[i]);
+		}
+
+		fprintf(stderr, "\nnow backup loaded bytes at addr are:\n");
+		content = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
+		print_bytes(&content, 8);
+		
+		rip = ptrace(PTRACE_PEEKUSER, pid, RIP, 0);		
+		fprintf(stderr, "\nchange rip from %lu to %lu\n", rip, addr);
+		ptrace(PTRACE_POKEUSER, pid, RIP, addr);
+
+		rip = ptrace(PTRACE_PEEKUSER, pid, RIP, 0);		
+		fprintf(stderr, "rip = %lu\n", rip);
+
+		fprintf(stderr, "\nloaded back bytes:\n");
+		content = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
+		print_bytes(&content, 8);
+		
+		fprintf(stderr, "\noutput: ");
+
+		ptrace(PTRACE_CONT, pid, NULL, NULL);
+		
+		wait(NULL);
 	}
 }
