@@ -9,10 +9,10 @@
 |                                   |                                                   |       |          |         |
 | Breakpoints                     	| mehrere, sonstige int3, RIP vergleichen?        	|      	|      high 	|   yes    	|
 |                                   |                                                   |       |          |         |
-| Code injizieren                 	| ALLES                                           	|    Kaywan  	|     high  	|       	|
+| Code injizieren                 	| ALLES                                           	|    Kaywan  	|     high  	|    yes   	|
 | Signale                         	|  Unerwartete Signale? 	                          |   Kaywan   	|    low   	|     yes  	|
 |                                   |                                                   |       |          |         |
-| Proof of concept                	| Git commit                                      	|      	|    high   	|       	|
+| Proof of concept                	| Git commit                                      	|      	|    high   	|   yes    	|
 |                                   |                                                   |       |          |         |
 | Speicher auslesen und verändern 	| Sprache                                         	|      	|     low  	|    yes   	|
 | Breakpoints                     	| Endian Padding?                                 	|    Lenni  	|     low  	|       	|
