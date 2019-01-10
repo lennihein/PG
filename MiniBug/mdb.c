@@ -137,20 +137,23 @@ pid_t init_tracee(char *str)
         exit(EXIT_FAILURE);
     }
 
-    // wait for sys 14
-    // waitpid(pid, &status, 0);
-    // assert(!WIFEXITED(status), "sys 14 failed");
-    // ptrace(PTRACE_SYSCALL, pid, 0,0);
-    // waitpid(pid, &status, 0);
-    // assert(!WIFEXITED(status), "sys 14 failed");
-    // ptrace(PTRACE_SYSCALL, pid, 0,0);
+    // wait for first interrupt of tracee
+    waitpid(pid, &status, 0);
+    assert(!WIFEXITED(status), "");
 
-    // wait for execvp
-    waitpid(pid, &status, 0);
-    assert(!WIFEXITED(status), "execvp() failed");
-    ptrace(PTRACE_SYSCALL, pid, 0,0);
-    waitpid(pid, &status, 0);
-    assert(!WIFEXITED(status), "execvp() failed");
+    // this one is weird, but it removes 
+    // the clutter that results from syscalls 
+    // that are due to the debugging process
+    // so only the syscalls from the original
+    // process are shown
+    for(int i = 0; i < 6; i++)
+    {
+
+        ptrace(PTRACE_SYSCALL, pid, 0,0);
+        waitpid(pid, &status, 0);
+        assert(!WIFEXITED(status), "");
+
+    }
 
     printf("> Tracee created, traced, and interrupted\n");
     return pid;

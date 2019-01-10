@@ -6,9 +6,12 @@ void stop(pid_t pid);
 int64_t __peek_reg__(pid_t pid, int16_t reg);
 void __next_syscall__(pid_t pid, int16_t syscall);
 
+// #define TARGET "tools/hello_from_c"
+#define TARGET "target/hello_from_asm"
+
 int main()
 {
-    int fd = init_net("tools/hello_world");
+    int fd = init_net(TARGET);
     REQUEST req;
 
     uint64_t orig_rax, rax, rsp, rbp, rip;

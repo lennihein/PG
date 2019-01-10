@@ -12,3 +12,4 @@
 
 void peek_reg(pid_t pid, int fd);
 void next_syscall(pid_t, int fd);
+void continue_tracee(pid_t, int fd);
