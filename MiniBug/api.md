@@ -3,11 +3,11 @@
 ## Funktionen 
 
 - create_breakpoint
-- show breakpoints
+- show_breakpoints
 - remove_breakpoint
 - singlestep
 - next_syscall
-- do_instructions
+- inject_instructions
 - poke_reg
 - peek_reg
 - peek_address
