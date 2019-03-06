@@ -1,0 +1,8 @@
+
+*.o
+
+DefectDeflect/setup/
+
+DefectDeflect/test\.cpp
+
+DefectDeflect/log\.txt

@@ -1,0 +1,1 @@
+reset && g++ -o client test_client.cpp -lzmq -lczmq && ./client && rm client
