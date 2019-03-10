@@ -17,8 +17,6 @@ sudo apt-get install pkg-config -y
 sudo apt-get install git -y
 git clone https://github.com/zeromq/libzmq.git
 cd libzmq
-mkdir build
-cd build
 ./autogen.sh
 ./configure
 make
