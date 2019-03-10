@@ -23,8 +23,16 @@ make
 sudo make install
 sudo ldconfig
 cd ..
-sudo apt-get install libczmq-dev -y
+git clone git://github.com/zeromq/czmq.git
+cd czmq
+./autogen.sh
+./configure
+make
+sudo make install
+sudo ldconfig
+cd ..
 rm libzmq -r -f
+rm czmq -r -f
 ```
 
 ### CZMQ API 
