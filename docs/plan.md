@@ -1,6 +1,6 @@
 # Todo
 
-| Task | STATUS | ASSIGN |
+| Task | STATUS | ASSIGNEE |
 |:---|:---:|:---:|
 migrate api to zero message queue (c++ strings) | ✓ | Lenni
 Implementierung von simplen Methoden | ✓ | Lenni
