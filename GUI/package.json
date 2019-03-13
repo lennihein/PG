@@ -9,7 +9,9 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "zeromq": "^5.1.0"
   },
   "author": "Maurice",
   "license": "ISC"

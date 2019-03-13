@@ -1,6 +1,6 @@
 <% include header %>
 <body>
-    <h1><%= topicHead %></h1>
+    <h1>DefectDeflect</h1>
     <form name="form1" method="POST" action="/reverse">
     <table>
         <tr>
@@ -17,8 +17,10 @@
     </table>
     
     </form>   
-    <% if(userValue!=null){ %>    
-        <div> Reversed String: <%= userValue.first %>  <%= userValue.last %> </div>
+    <% if(userValue!=null){ %>
+        <!--<div> Reversed String: <%= userValue.first %>  <%= userValue.last %> </div>-->
     <%}%> 
+    <button type="button" onclick="location.href='debug' ">Confirm</button>
+    <a href="debug">Debug</a>
 </body>
 <% include footer %>
