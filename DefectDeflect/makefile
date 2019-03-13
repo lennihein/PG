@@ -15,6 +15,5 @@ compile: dd.o lib.o
 	g++ -o dd dd.o lib.o $(CFLAGS) $(LIBS)
 
 run: | compile
-	reset
 	@./$(DIR)dd
 	@rm *.o dd

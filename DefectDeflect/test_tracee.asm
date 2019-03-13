@@ -13,7 +13,18 @@ _start:
     mov RAX, 1
     mov RDI, 1          ; stdout
     mov RSI, str        
-    mov RDX, str_len    
+    syscall
+
+    ; sys_write
+    mov RAX, 1
+    mov RDI, 1          ; stdout
+    mov RSI, str        
+    syscall
+
+    ; sys_write
+    mov RAX, 1
+    mov RDI, 1          ; stdout
+    mov RSI, str        
     syscall
 
     ; sys_exit

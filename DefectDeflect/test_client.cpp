@@ -1,6 +1,7 @@
 #include "header.hpp"
 
 #define TARGET "./tracee"
+// #define TARGET "./a.out"
 
 int main()
 {   
@@ -9,20 +10,78 @@ int main()
     assert(sock);
     err = zsock_connect(sock, "tcp://127.0.0.1:5555");
     assert_no_err(err);
-
     err = zstr_send(sock, TARGET);
     assert_no_err(err);
-
     zstr_recv(sock);
+    char* string;
 
-    err = zstr_send(sock, "CONTINUE");
+    // poke 12 into rdx
+    err = zstr_send(sock, "POKE_REG");
     assert_no_err(err);
+    string = zstr_recv(sock);
+    err = zstr_send(sock, "96");
+    assert_no_err(err);
+    string = zstr_recv(sock);
+    assert(string);
+    free(string);
+    err = zstr_send(sock, "12");
+    assert_no_err(err);
+    string = zstr_recv(sock);
+    assert(string);
+    free(string);
 
-    char* string = zstr_recv(sock);
+    // get rdx
+    err = zstr_send(sock, "PEEK_REG");
+    assert_no_err(err);
+    string = zstr_recv(sock);
+        err = zstr_send(sock, "96");
+    assert_no_err(err);
+    string = zstr_recv(sock);
+    assert(string);
+    printf("RDX: %s\n", string);
+    free(string);
+
+    err = zstr_send(sock, "NEXT_SYSCALL");
+    assert_no_err(err);
+    string = zstr_recv(sock);
     assert(string);
     puts(string);
     free(string);
 
+    loop:
+
+    // get rax
+    err = zstr_send(sock, "PEEK_REG");
+    assert_no_err(err);
+    string = zstr_recv(sock);
+    err = zstr_send(sock, "80");
+    assert_no_err(err);
+    string = zstr_recv(sock);
+    assert(string);
+    printf("RAX: %s\n", string);
+    free(string);
+
+    // get orig_rax
+    err = zstr_send(sock, "PEEK_REG");
+    assert_no_err(err);
+    string = zstr_recv(sock);
+        err = zstr_send(sock, "120");
+    assert_no_err(err);
+    string = zstr_recv(sock);
+    assert(string);
+    printf("ORIG_RAX: %s\n", string);
+    free(string);
+
+    err = zstr_send(sock, "NEXT_SYSCALL");
+    assert_no_err(err);
+
+    string = zstr_recv(sock);
+    assert(string);
+    puts(string);
+    if(!strcmp(string, "EXIT")) goto exit;
+    free(string);
+    goto loop;
+    
     err = zstr_send(sock, "EXIT");
     assert_no_err(err);
 
@@ -33,6 +92,6 @@ int main()
 
     sleep(1);
 
-    zsock_destroy(&sock);
+    exit: zsock_destroy(&sock);
     return EXIT_SUCCESS;
 }

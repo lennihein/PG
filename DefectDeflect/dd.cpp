@@ -45,21 +45,9 @@ int main()
 
     func[command](sock, pid); 
     // todo what happens if command not mappable?
+    // sends "NOT_FOUND" in case of unmappable input
 
     goto loop;
-}
-
-// redirect stdout to file
-void init_log() 
-{
-    FILE *log_out = fopen("log.txt", "w");
-    int log_fd = fileno(log_out);
-    close(1);           //closing stdout
-    dup(log_fd);        //stdout is now written to "log.txt"      
-    fclose(log_out);    // closing stream
-    close(log_fd);      // closing File Descriptor
-    // only stdout is open, and leads towards log.txt
-    printf("> Log output redirected\n");
 }
 
 // setup ZMQ connection
@@ -106,7 +94,7 @@ pid_t init_tracee(char *str)    // todo: revise
     {
         ptrace(PTRACE_TRACEME, NULL, NULL, NULL);
         ptrace(PTRACE_SETOPTIONS, pid, NULL, PTRACE_O_EXITKILL);
-        // close(STDOUT_FILENO); // currently we are writing stdout to log.txt anyway
+        // close(STDOUT_FILENO); // would omit tracee output
         raise(SIGSTOP);
         err = execvp(tokens[0], tokens);
         exit(EXIT_FAILURE);
@@ -119,8 +107,9 @@ pid_t init_tracee(char *str)    // todo: revise
     // the clutter that results from syscalls 
     // that are due to the debugging process
     // so only the syscalls from the original
-    // process are shown
-    for(int i = 0; i < 6; i++)
+    // process are shown    
+    // skipped syscalls are sys_rt_sigprocmask and sys_execve
+    for(int i = 0; i < 5; i++) 
     {
         ptrace(PTRACE_SYSCALL, pid, 0,0);
         waitpid(pid, &status, 0);
@@ -150,20 +139,18 @@ void func_exit(zsock_t* sock, pid_t pid)
     exit(0);
 }
 
-// sends "RETURN [BREAKPOINT/INT]" or "EXIT" 
+// sends "RETURN" or "EXIT"
 // based on type of int
 void func_continue(zsock_t* sock, pid_t pid)
 {
     int code = __continue__(pid);
-    if(code == -1) func_exit(sock, pid);
-    zstr_sendf(sock, "RETURN %s", code?"BREAKPOINT":"INT");
+    if(code == __EXIT__) func_exit(sock, pid);
+    zstr_sendf(sock, "RETURN");
 }
 
 // sends ""
 // receives an address (decimal to str)
-// sends "RETURN [SUCCESS/FAILURE]"
-// based on whether or not a breakpoint was set
-// note: 'FAILURE' in case of breakpoint already set at that addr
+// sends "RETURN"
 void func_create_breakpoint(zsock_t* sock, pid_t pid)
 {
     zstr_send(sock, "");
@@ -183,8 +170,7 @@ void func_show_breakpoints(zsock_t* sock, pid_t pid)
 
 // sends ""
 // receives an address (decimal to str)
-// sends "RETURN [SUCCESS/FAILURE]"
-// based on whether or not a breakpoint was removed
+// sends "RETURN""
 void func_remove_breakpoint(zsock_t* sock, pid_t pid)
 {
     zstr_send(sock, "");
@@ -195,25 +181,26 @@ void func_remove_breakpoint(zsock_t* sock, pid_t pid)
     free(str);
 }
 
-// sends "RETURN [STEP/BREAKPOINT/INT]" or "EXIT" 
-// based on type of int
+// sends "RETURN" or "EXIT" 
+// based on type of ssoftware interrupt
 void func_singlestep(zsock_t* sock, pid_t pid)
 {
     // int code = __singlestep__(pid);
     int code = 0; // only stub
-    if(pid == -1) func_exit(sock, pid);
-    zstr_sendf(sock, "RETURN %s", code?(code==1?"BREAKPOINT":"INT"):"STEP");
+    if(pid == __EXIT__) func_exit(sock, pid);
+    else zstr_sendf(sock, "RETURN %s", code?(code==1?"BREAKPOINT":"INT"):"STEP");
 
 }
 
 // JUMPS PAST BREAKPOINTS
-// sends "RETURN" or "EXIT"
+// sends "RETURN [ENTER/LEAVE]" or "EXIT"
 // based on whether or not a next syscall was even existent
+// and if it was the interrupt before or after the kernal handles the call
 void func_next_syscall(zsock_t* sock, pid_t pid)
 {
-    // int code = __next_syscall__(pid)
-    int code = 0; // only stub
-    zstr_sendf(sock, "%s", code?"RETURN":"EXIT");
+    int code = __next_syscall__(pid);
+    if(code!=__EXIT__) zstr_sendf(sock, "RETURN %s", code?"LEAVE":"ENTER");
+    else func_exit(sock, pid);
 }
 
 // sends ""
@@ -240,9 +227,10 @@ void func_peek_reg(zsock_t* sock, pid_t pid)
 {
     zstr_send(sock, "");
     char* str = zstr_recv(sock);
-    // int res = __peek_reg__(..)
-    int res = 42; // only stub
-    zstr_sendf(sock, "RETURN %i", res);
+    char* end = str + strlen(str) - 1;
+    uint64_t reg = strtoull(str, &end, 10);
+    uint64_t res = __peek_reg__(pid, reg);
+    zstr_sendf(sock, "RETURN %" PRIu64, res);
     free(str);
 }
 
@@ -257,7 +245,11 @@ void func_poke_reg(zsock_t* sock, pid_t pid)
     char* str1 = zstr_recv(sock);
     zstr_send(sock, "");
     char* str2 = zstr_recv(sock);
-    // ...
+    char* end1 = str1 + strlen(str1) - 1;
+    char* end2 = str2 + strlen(str2) - 1;
+    uint64_t reg = strtoull(str1, &end1, 10);
+    uint64_t data = strtoull(str2, &end2, 10);
+    __poke_reg__(pid, reg, data);
     zstr_send(sock, "RETURN");
     free(str1);
     free(str2);
@@ -270,9 +262,10 @@ void func_peek_address(zsock_t* sock, pid_t pid)
 {
     zstr_send(sock, "");
     char* str = zstr_recv(sock);
-    // int res = ..
-    int res = 43; // only stub
-    zstr_sendf(sock, "RETURN %i", res);
+    char* end = str + strlen(str) - 1;
+    uint64_t addr = strtoull(str, &end, 10);
+    uint64_t res = __peek_addr__(pid, addr);
+    zstr_sendf(sock, "RETURN %" PRIu64, res);
     free(str);
 }
 
@@ -287,7 +280,11 @@ void func_poke_address(zsock_t* sock, pid_t pid)
     char* str1 = zstr_recv(sock);
     zstr_send(sock, "");
     char* str2 = zstr_recv(sock);
-    // ...
+    char* end1 = str1 + strlen(str1) - 1;
+    char* end2 = str2 + strlen(str2) - 1;
+    uint64_t addr = strtoull(str1, &end1, 10);
+    uint64_t data = strtoull(str2, &end2, 10);
+    __poke_addr__(pid, addr, data);
     zstr_send(sock, "RETURN");
     free(str1);
     free(str2);

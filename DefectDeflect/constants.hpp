@@ -1,5 +1,8 @@
 #define ENDPOINT "tcp://127.0.0.1:5555"
 
+#define __RETURN__ 1
+#define __EXIT__ -1
+
 // registers
 # define R15	    8*00
 # define R14	    8*01
