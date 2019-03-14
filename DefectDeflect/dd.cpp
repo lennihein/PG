@@ -42,8 +42,8 @@ int main()
 
     char* command = zstr_recv(sock);
     printf("> %s\n", command);
-
     func[command](sock, pid); 
+    // sleep(1);
     // todo what happens if command not mappable?
     // sends "NOT_FOUND" in case of unmappable input
 
@@ -185,10 +185,9 @@ void func_remove_breakpoint(zsock_t* sock, pid_t pid)
 // based on type of ssoftware interrupt
 void func_singlestep(zsock_t* sock, pid_t pid)
 {
-    // int code = __singlestep__(pid);
-    int code = 0; // only stub
+    int code = __singlestep__(pid);
     if(pid == __EXIT__) func_exit(sock, pid);
-    else zstr_sendf(sock, "RETURN %s", code?(code==1?"BREAKPOINT":"INT"):"STEP");
+    else zstr_sendf(sock, "RETURN");
 
 }
 
@@ -293,19 +292,18 @@ void func_poke_address(zsock_t* sock, pid_t pid)
 // sends "RETURN <literally the whole fucking stack (hex to str)>"
 void func_view_stack(zsock_t* sock, pid_t pid)
 {
-    // char* stackframe = __view_stack__(pid);
-    char* stackframe = (char*) malloc(sizeof(char));
-    stackframe[0] = '\0';
+    char* stackframe = __view_stack__(pid);
     zstr_sendf(sock, "RETURN %s", stackframe);
     free(stackframe);
 }
 
 // sends ""
-// receives signal (int, see signal.h)
+// receives signal (decimal to str, see signal.h)
 // sends "RETURN"
 void func_raise_signal(zsock_t* sock, pid_t pid)
 {
     zstr_send(sock, "");
     char* str = zstr_recv(sock);
+    __raise_signal__(pid, atoi(str));
     zstr_send(sock, "RETURN");
 }

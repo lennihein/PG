@@ -11,21 +11,12 @@ _start:
 
     ; sys_write
     mov RAX, 1
-    mov RDI, 1          ; stdout
-    mov RSI, str        
-    syscall
-
-    ; sys_write
     mov RAX, 1
     mov RDI, 1          ; stdout
-    mov RSI, str        
+    mov RSI, str   
+    mov RDX, 12     
     syscall
-
-    ; sys_write
     mov RAX, 1
-    mov RDI, 1          ; stdout
-    mov RSI, str        
-    syscall
 
     ; sys_exit
     mov RAX, 60

@@ -51,7 +51,7 @@ void func_show_breakpoints(zsock_t*, pid_t);
 void func_remove_breakpoint(zsock_t*, pid_t);
 // todo: DD2
 void func_singlestep(zsock_t*, pid_t);
-// todo: DD1
+int __singlestep__(pid_t pid);
 void func_next_syscall(zsock_t*, pid_t);
 int __next_syscall__(pid_t pid);
 void func_inject_instructions(zsock_t*, pid_t);
@@ -65,6 +65,6 @@ uint64_t __peek_addr__(pid_t pid, uint64_t addr);
 void func_poke_address(zsock_t*, pid_t pid);
 void __poke_addr__(pid_t pid, uint64_t addr, uint64_t data);
 void func_view_stack(zsock_t*, pid_t);
-// todo: DD1
+char* __view_stack__(pid_t pid);
 void func_raise_signal(zsock_t*, pid_t);
-// todo: DD1
+void __raise_signal__(pid_t pid, int signal);
