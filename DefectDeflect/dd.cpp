@@ -186,7 +186,7 @@ void func_remove_breakpoint(zsock_t* sock, pid_t pid)
 void func_singlestep(zsock_t* sock, pid_t pid)
 {
     int code = __singlestep__(pid);
-    if(pid == __EXIT__) func_exit(sock, pid);
+    if(code == __EXIT__) func_exit(sock, pid);
     else zstr_sendf(sock, "RETURN");
 
 }

@@ -57,21 +57,16 @@ char* __view_stack__(pid_t pid)
 {
     uint64_t rbp = __peek_reg__(pid, RBP);
     uint64_t rsp = __peek_reg__(pid, RSP);    
-    uint64_t length = rbp-rsp;
+    uint64_t length = (rbp-rsp)/8;
     char* str = (char*) malloc(sizeof(char)*(39*length)+1);
-    printf("RBP: %" PRIu64 "\nRSP: %" PRIu64 "\nLength: %" PRIu64 "\n", rbp, rsp, length);
-    sleep(1);   // remove these
     assert(str!=NULL);    
-    for(uint64_t offset=0; offset<=length; offset++)
+    for(uint64_t offset=0; offset<length; offset++)
     {
-        boop((int) offset);
-        sleep(1);   // remove these
-        uint64_t addr = rsp-(offset+1)*8;
+        uint64_t addr = rbp-(offset+1)*8;
         uint64_t val = __peek_addr__(pid, addr);
         int err = snprintf(str+offset*39, 40, "%#018" PRIx64 ": %#018" PRIx64 "\n" , addr, val);
         assert(err==39);
     }
-    printf("HERE COMES THE STACK:\n\n%s\n", str); // remove this
     return str;
 }
 
@@ -87,8 +82,17 @@ int __singlestep__(pid_t pid)
     uint64_t rip = __peek_reg__(pid, RIP);
     uint64_t data = __peek_addr__(pid, rip);
     uint64_t instr = data & 0xffff;
-    fprintf(stderr, "> addr: %#018" PRIx64 "\nnext instruction: %#06" PRIx64 "\n", rip, instr);
-    ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL);
+    if(rip == 0xffffffffffffffff) {return __EXIT__;}    
+    if(instr != 0x050F) 
+    {
+        ptrace(PTRACE_SINGLESTEP, pid, NULL, NULL);
+    }
+    else
+    {   
+        // calling once for 'enter', then once for 'leave'
+        __next_syscall__(pid);
+        return __next_syscall__(pid);
+    }
     int status;
     int err = waitpid(pid, &status, 0);
     // todo: DD2
