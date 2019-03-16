@@ -19,7 +19,7 @@ int main()
     for(int x = 0; x<=15; x++)
     {
 
-        err = zstr_send(sock, "SINGLESTEPP");
+        err = zstr_send(sock, "SINGLESTEP");
         assert_no_err(err);
 
         string = zstr_recv(sock);

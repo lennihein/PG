@@ -155,7 +155,7 @@ void func_exit(zsock_t* sock, pid_t pid)
 }
 
 // sends "RETURN" or "EXIT"
-// based on type of int
+// based on whether or not tracee exited
 void func_continue(zsock_t* sock, pid_t pid)
 {
     int code = __continue__(pid);
@@ -163,6 +163,7 @@ void func_continue(zsock_t* sock, pid_t pid)
     zstr_sendf(sock, "RETURN");
 }
 
+// todo: DD2
 // sends ""
 // receives an address (decimal to str)
 // sends "RETURN"
@@ -176,6 +177,7 @@ void func_create_breakpoint(zsock_t* sock, pid_t pid)
     free(str);
 }
 
+// todo: DD2
 // sends "RETURN <addr1> <addr2> ..."
 void func_show_breakpoints(zsock_t* sock, pid_t pid)
 {
@@ -183,6 +185,7 @@ void func_show_breakpoints(zsock_t* sock, pid_t pid)
     zstr_send(sock, "RETURN");
 }
 
+// todo: DD2
 // sends ""
 // receives an address (decimal to str)
 // sends "RETURN""
@@ -197,7 +200,7 @@ void func_remove_breakpoint(zsock_t* sock, pid_t pid)
 }
 
 // sends "RETURN" or "EXIT" 
-// based on type of ssoftware interrupt
+// based on whether or not tracee exited
 void func_singlestep(zsock_t* sock, pid_t pid)
 {
     int code = __singlestep__(pid);
@@ -206,7 +209,7 @@ void func_singlestep(zsock_t* sock, pid_t pid)
 
 }
 
-// JUMPS PAST BREAKPOINTS
+// JUMPS PAST BREAKPOINTS ?
 // sends "RETURN [ENTER/LEAVE]" or "EXIT"
 // based on whether or not a next syscall was even existent
 // and if it was the interrupt before or after the kernal handles the call
@@ -217,10 +220,11 @@ void func_next_syscall(zsock_t* sock, pid_t pid)
     else func_exit(sock, pid);
 }
 
+// todo: DD3
 // sends ""
 // receives address (decimal to str)
 // sends ""
-// receives payload (decimal to str) 
+// receives payload (decimal to str) ?
 // sends "RETURN"
 void func_inject_instructions(zsock_t* sock, pid_t pid)
 {
@@ -304,7 +308,7 @@ void func_poke_address(zsock_t* sock, pid_t pid)
     free(str2);
 }
 
-// sends "RETURN <literally the whole fucking stack (hex to str)>"
+// sends "RETURN <literally the whole fucking stack including addresses (hex to str)>"
 void func_view_stack(zsock_t* sock, pid_t pid)
 {
     char* stackframe = __view_stack__(pid);
