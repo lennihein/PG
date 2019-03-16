@@ -68,3 +68,4 @@ void func_view_stack(zsock_t*, pid_t);
 char* __view_stack__(pid_t pid);
 void func_raise_signal(zsock_t*, pid_t);
 void __raise_signal__(pid_t pid, int signal);
+// todo: DD4 - step in/step over
