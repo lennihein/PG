@@ -38,14 +38,29 @@ int main()
 
     printf("> functionalities mapped\n");
 
+    void* command;
+    char* command_str;
+
     loop: // main loop
 
-    char* command = zstr_recv(sock);
-    printf("> %s\n", command);
-    func[command](sock, pid); 
-    // sleep(1);
-    // todo what happens if command not mappable?
-    // sends "NOT_FOUND" in case of unmappable input
+    command_str = zstr_recv(sock);
+    command = (void*) func[command_str];
+    if(command == NULL)
+    {
+        fprintf(stderr, "> %s - command not found\n", command_str);
+        zstr_send(sock, "COMMAND_NOT_FOUND");
+        __exit__(pid);
+        sleep(1);
+        zsock_destroy(&sock);    
+        fprintf(stderr, "> DefectDeflect shutting down\n");
+        exit(0);
+
+    }
+    else
+    {
+        printf("> %s\n", command_str);
+        ((void (*)(zsock_t*, pid_t))command)(sock, pid);
+    }
 
     goto loop;
 }

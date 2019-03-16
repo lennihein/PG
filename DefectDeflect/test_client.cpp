@@ -19,13 +19,13 @@ int main()
     for(int x = 0; x<=15; x++)
     {
 
-        err = zstr_send(sock, "SINGLESTEP");
+        err = zstr_send(sock, "SINGLESTEPP");
         assert_no_err(err);
 
         string = zstr_recv(sock);
         assert(string);
         puts(string);
-        if(!strcmp(string, "EXIT")) goto exit;
+        if(!strcmp(string, "EXIT") || !strcmp(string, "COMMAND_NOT_FOUND")) goto exit;
         free(string); 
 
         // get rax
