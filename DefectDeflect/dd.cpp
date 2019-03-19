@@ -5,7 +5,7 @@ int main()
     zsock_t* sock;
     pid_t pid;
 
-    fprintf(stderr, "> DefectDeflect service started\n");
+    printf("> DefectDeflect service started\n");
 
     // init_log();
     sock = init_net(); 
@@ -47,12 +47,12 @@ int main()
     command = (void*) func[command_str];
     if(command == NULL)
     {
-        fprintf(stderr, "> %s - command not found\n", command_str);
+        printf("> %s - command not found\n", command_str);
         zstr_send(sock, "COMMAND_NOT_FOUND");
         __exit__(pid);
         sleep(1);
         zsock_destroy(&sock);    
-        fprintf(stderr, "> DefectDeflect shutting down\n");
+        printf("> DefectDeflect shutting down\n");
         exit(0);
 
     }
@@ -150,7 +150,7 @@ void func_exit(zsock_t* sock, pid_t pid)
     sleep(1);
 
     zsock_destroy(&sock);    
-    fprintf(stderr, "> DefectDeflect shutting down\n");
+    printf("> DefectDeflect shutting down\n");
     exit(0);
 }
 
@@ -172,8 +172,7 @@ void func_create_breakpoint(zsock_t* sock, pid_t pid)
     zstr_send(sock, "");
     char* str = zstr_recv(sock);
     // int code = __create_breakpoint__(pid, atoi(str));
-    int code = 0; // only stub
-    zstr_sendf(sock, "RETURN %s", code?"FAILURE":"SUCCESS");
+    zstr_sendf(sock, "RETURN");
     free(str);
 }
 

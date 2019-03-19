@@ -1,5 +1,9 @@
 # DefectDeflect
 
+## TODO:
+
+endptr bla
+
 ## Zero Message Queue
 
 ### Installation of Zero Message Queue
