@@ -61,6 +61,17 @@ int main()
         printf("RDX: %s\n", string);
         free(string);
 
+        // get rip
+        err = zstr_send(sock, "PEEK_REG");
+        assert_no_err(err);
+        string = zstr_recv(sock);
+        err = zstr_send(sock, "128");
+        assert_no_err(err);
+        string = zstr_recv(sock);
+        assert(string);
+        printf("RIP: %s\n", string);
+        free(string);
+
     }
         err = zstr_send(sock, "VIEW_STACK");
         assert_no_err(err);
