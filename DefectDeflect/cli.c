@@ -135,7 +135,7 @@ void cli_routine()
     }
     if(!strcmp(input, "NEXT_SYSCALL"))   // next syscall
     {
-        char* string=singlestep(sock);
+        char* string=next_syscall(sock);
         if("EXIT"==string)    // next_syscall reached end
         {
             zsock_destroy(&sock);
@@ -190,6 +190,7 @@ void cli_routine()
         printf("shutting down ...");
         free(input);
         destroy(sock); 
+        return;
     }
     printf("WRONG INPUT\n");
     goto loop;
