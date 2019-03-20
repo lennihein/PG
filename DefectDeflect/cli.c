@@ -136,7 +136,7 @@ void cli_routine()
     if(!strcmp(input, "NEXT_SYSCALL"))   // next syscall
     {
         char* string=next_syscall(sock);
-        if("EXIT"==string)    // next_syscall reached end
+        if(!strcmp("EXIT",string))    // next_syscall reached end
         {
             zsock_destroy(&sock);
             free(input);
@@ -145,15 +145,15 @@ void cli_routine()
         else                
         {
             char* buf=cutoff(string);
-            if("ENTER"==buf)            // syscall entry
+            if(!strcmp("ENTER",buf))            // syscall entry
             {
                 printf("syscall entry\n");
             }
-            if("LEAVE"==buf)
+            if(!strcmp("LEAVE",buf))
             {
                 printf("syscall exit\n"); // syscall exit
             }
-            if("ENTER"!=buf&&"LEAVE"!=buf)
+            if(strcmp("ENTER",buf)&&strcmp("LEAVE",buf)) //if neither ENTER nor LEAVE
             {
                 printf("unknown return\n");   // unexpected string
             }
@@ -411,4 +411,23 @@ char* cutoff(char* string)  // cuts off "RETURN " at beginning
         free(string);
         return result;  // return string without "RETURN "
     }
+}
+
+char* convert(char* string) //small to caps and spaces to _ "peek reg" to "PEEK_REG"
+{
+    char buf[30];
+    strcpy(buf,string);
+    int i;
+    for(i=0; i<sizeof(string); i++)
+    {
+        if((int)buf[i]==32) //check if space
+        {
+            buf[i]=(char)95; //ascii number for "_"
+        }
+        else
+        {
+            buf[i]=(char)((int)buf[i]-32); //ascii number lower to upper case
+        }
+    }
+    return buf;
 }
