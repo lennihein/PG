@@ -13,7 +13,7 @@ int main()
     if(pid)     // parent
     {
         cli_routine();
-
+        waitpid(pid, NULL, 0);
         exit(EXIT_SUCCESS);
 
     }
@@ -44,20 +44,13 @@ void cli_routine()
     char* target = TARGET;
     fprintf(stderr, "now init...");
     zsock_t* sock = init(target);
-    uint64_t rax = peek_reg(sock, RAX);
-    getchar();
-    int err = zstr_send(sock, "SINGLESTEP");
-    assert(err!=-1);
-    char* string = zstr_recv(sock);
-    assert(string);
-    puts(string);
-    free(string); 
-    sleep(1);    
-    zsock_destroy(&sock);
-    return;
+    
+    char* input = malloc(sizeof(char)*16);
 
-    char* input;
-    scanf("%s", input);
+    loop:
+
+    scanf("%15s", input);
+
     if(!strcmp(input,"PEEK_REG")) //peek_reg
     {
         char* reg;
@@ -65,6 +58,7 @@ void cli_routine()
         scanf("%s",reg);
         uint64_t result = peek_reg(sock, reg);
         printf("%s: %lu",reg, result);
+        goto loop;
     }
     if(!strcmp(input,"POKE_REG")) //poke_reg
     {
@@ -76,6 +70,7 @@ void cli_routine()
         scanf("%lu", &data);
         poke_reg(sock, reg, data);
         printf("poked succesfully\n");
+        goto loop;
 
     }
     if(!strcmp(input, "VIEW_STACK")) //view_stack
@@ -83,6 +78,7 @@ void cli_routine()
         char* string=view_stack(sock);
         printf("%s",string);
         free(string);
+        goto loop;
     }
     if(!strcmp(input, "PEEK_ADR")) //peek_adr
     {
@@ -91,6 +87,7 @@ void cli_routine()
         scanf("%lu",&adr);
         uint64_t result = peek_reg(sock, (char*)adr);
         printf("%lu: %lu\n",adr, result);
+        goto loop;
     }
     if(!strcmp(input, "RAISE_SIGNAL"))      //raise signal
     {
@@ -99,6 +96,7 @@ void cli_routine()
         scanf("%i",&signal);
         raise_signal(sock, signal);
         printf("signal raised\n");
+        goto loop;
     }
     if(!strcmp(input, "CREATE_BREAKPOINT")) // create breakpoint
     {
@@ -107,12 +105,14 @@ void cli_routine()
         scanf("%lu",&adr);
         create_breakpoint(sock, adr);
         printf("breakpoint set\n");
+        goto loop;
     }
     if(!strcmp(input, "SHOW_BREAKPOINTS"))  // show breakpoints
     {
         char* string=show_breakpoints(sock);
         printf("%s",string);
         free(string);
+        goto loop;
     }
     if(!strcmp(input, "REMOVE_BREAKPOINT")) // remove breakpoint
     {
@@ -121,20 +121,26 @@ void cli_routine()
         scanf("%lu",&adr);
         remove_breakpoint(sock,adr);
         printf("breakpoint removed\n");
+        goto loop;
     }
     if(!strcmp(input, "SINGLESTEP"))    // singlestep
     {
         if("EXIT"==singlestep(sock))    // singlestep reached end
         {
-            destroy(sock);              
+            zsock_destroy(&sock);
+            free(input);
+            return;
         }
+        goto loop;
     }
     if(!strcmp(input, "NEXT_SYSCALL"))   // next syscall
     {
         char* string=singlestep(sock);
         if("EXIT"==string)    // next_syscall reached end
         {
-            destroy(sock);      
+            zsock_destroy(&sock);
+            free(input);
+            return;  
         }
         else                
         {
@@ -152,6 +158,7 @@ void cli_routine()
                 printf("unknown return\n");   // unexpected string
             }
         }
+        goto loop;
     }
     if(!strcmp(input, "INJECT_INSTRUCTIONS"))
     {
@@ -163,6 +170,7 @@ void cli_routine()
         scanf("%s",payload);
         inject_instructions(sock, adr, payload);
         printf("instructions injected\n");
+        goto loop;
     }
     if(!strcmp(input, "CONTINUE"))
     {
@@ -174,13 +182,17 @@ void cli_routine()
         else
         {
             printf("tracee continued\n");
-        }
+        }        
+        goto loop;
     }
     if(!strcmp(input, "EXIT"))
     {
         printf("shutting down ...");
+        free(input);
+        destroy(sock); 
     }
-    destroy(sock); 
+    printf("WRONG INPUT\n");
+    goto loop;
 }
 
 zsock_t* init(char* target)
@@ -205,6 +217,18 @@ zsock_t* init(char* target)
     fprintf(stderr, "done\n");
 
     return sock;
+}
+
+void destroy(zsock_t* sock)
+{
+    int err = zstr_send(sock, "EXIT");
+    assert(err!=-1);
+    char* string = zstr_recv(sock);
+    assert(string);
+    assert(!strcmp(string, "EXIT"));
+    free(string);
+    sleep(1);    
+    zsock_destroy(&sock);
 }
 
 char* func_continue(zsock_t* sock)
@@ -369,18 +393,6 @@ void func_exit(zsock_t* sock)
     int err = zstr_send(sock, "EXIT");
     assert(err!=-1);
     char* string = zstr_recv(sock);
-}
-
-void destroy(zsock_t* sock)
-{
-    int err = zstr_send(sock, "EXIT");
-    assert(err!=-1);
-    char* string = zstr_recv(sock);
-    assert(string);
-    assert(!strcmp(string, "EXIT"));
-    free(string);
-    sleep(1);    
-    zsock_destroy(&sock);
 }
 
 char* cutoff(char* string)  // cuts off "RETURN " at beginning
