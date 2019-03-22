@@ -77,7 +77,7 @@ void __raise_signal__(pid_t pid, int signal)
     // tracee runs now, add breakpoint right at the spot
 }
 
-int __singlestep__(pid_t pid)
+int __singlestep__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr)
 {
     uint64_t rip = __peek_reg__(pid, RIP);
     uint64_t data = __peek_addr__(pid, rip);
@@ -95,10 +95,7 @@ int __singlestep__(pid_t pid)
     }
     int status;
     int err = waitpid(pid, &status, 0);
-    // todo: DD2
-    // check if breakpoint
-    // if breakpoint: restore old data
-    // and remove breakpoint
+    __check_for_breakpoint__(pid, breakpoints_ptr);
     return WIFEXITED(status)?__EXIT__:__RETURN__;
 
 }
@@ -111,7 +108,7 @@ void __create_breakpoint__(pid_t pid, uint64_t addr, std::map<uint64_t, uint64_t
     __poke_addr__(pid, addr, 0xffffffffffffffccu);
 }
 
-void __remove_breakpoint__(pid_t pid, uint64_t addr, std::map<uint64_t, uint64_t>* breakpoints_ptr)
+int __remove_breakpoint__(pid_t pid, uint64_t addr, std::map<uint64_t, uint64_t>* breakpoints_ptr)
 {
     std::map<uint64_t, uint64_t>::iterator breakpoint = breakpoints_ptr->find(addr);
     if(breakpoint != breakpoints_ptr->end());
@@ -120,10 +117,11 @@ void __remove_breakpoint__(pid_t pid, uint64_t addr, std::map<uint64_t, uint64_t
         __poke_addr__(pid, addr, breakpoint->second);
         // remove breakpoint from management
         breakpoints_ptr->erase(breakpoint);
+        return 1;
     }
     else
     {
-        printf(" Breakpoint not found!");
+        return 0;
     }
 }
 
@@ -142,4 +140,23 @@ void __show_breakpoints__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_p
         offset += 39;
     goto loop;
     end: return result;
+}
+
+void __check_for_breakpoint__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr)
+{
+    // fetch rip position
+    uint64_t rip = __peek_reg__(pid, RIP);
+    // if there was a breakpoint, restore old data
+    int res = __remove_breakpoint__(pid, --rip, breakpoints_ptr);
+    // check if last byte was interrupt, aka if there was a breakpoint
+    if(res)
+    {
+        // decrement the actual RIP
+        __poke_reg__(pid, RIP, rip);
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
