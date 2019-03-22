@@ -19,12 +19,15 @@ int __continue__(pid_t pid)
     return WIFEXITED(status)?__EXIT__:__RETURN__;
 }
 
-int __next_syscall__(pid_t pid)
+int __next_syscall__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr)
 {
     int status;
-    ptrace(PTRACE_SYSCALL, pid, NULL, NULL);
-    waitpid(pid, &status, 0);
-    // todo: DD2 check if breakpoint, if breakpoint, restore data, remove breakpoint, and skip?
+
+    loop: ptrace(PTRACE_SYSCALL, pid, NULL, NULL);
+    waitpid(pid, &status, 0);    
+    // if a breakpoint was hit, restore and wait for next syscall again
+    if(__check_for_breakpoint__(pid, breakpoints_ptr)) goto loop;
+    
     if(WIFEXITED(status))
     {
         return __EXIT__;
@@ -73,8 +76,6 @@ char* __view_stack__(pid_t pid)
 void __raise_signal__(pid_t pid, int signal)
 {
     ptrace(PTRACE_CONT, pid, 0, signal);
-    // todo: DD2
-    // tracee runs now, add breakpoint right at the spot
 }
 
 int __singlestep__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr)

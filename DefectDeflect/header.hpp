@@ -54,7 +54,7 @@ void __check_for_breakpoint__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoin
 void func_singlestep(zsock_t*, pid_t);
 int __singlestep__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr);
 void func_next_syscall(zsock_t*, pid_t);
-int __next_syscall__(pid_t pid);
+int __next_syscall__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr)
 void func_inject_instructions(zsock_t*, pid_t);
 // todo: DD3
 void func_poke_reg(zsock_t*, pid_t);
