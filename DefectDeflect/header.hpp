@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <map>
+#include <iterator> 
 #include <string>
 #include <iostream>
 #include <sys/ptrace.h>
@@ -43,18 +44,18 @@ pid_t init_tracee(char* str);
 void func_exit(zsock_t*, pid_t);
 void __exit__(pid_t pid);
 void func_continue(zsock_t*, pid_t);
-int __continue__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr);
+int __continue__(pid_t pid);
 void func_create_breakpoint(zsock_t*, pid_t);
-void __create_breakpoint__(pid_t pid, uint64_t addr, std::map<uint64_t, uint64_t>* breakpoints_ptr);
+void __create_breakpoint__(pid_t pid, uint64_t addr);
 void func_show_breakpoints(zsock_t*, pid_t);
-void __show_breakpoints__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr);
+char* __show_breakpoints__(pid_t pid);
 void func_remove_breakpoint(zsock_t*, pid_t);
-int __remove_breakpoint__(pid_t pid, uint64_t addr, std::map<uint64_t, uint64_t>* breakpoints_ptr);
-void __check_for_breakpoint__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr);
+int __remove_breakpoint__(pid_t pid, uint64_t addr);
+int __check_for_breakpoint__(pid_t pid);
 void func_singlestep(zsock_t*, pid_t);
-int __singlestep__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr);
+int __singlestep__(pid_t pid);
 void func_next_syscall(zsock_t*, pid_t);
-int __next_syscall__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr)
+int __next_syscall__(pid_t pid);
 void func_inject_instructions(zsock_t*, pid_t);
 // todo: DD3
 void func_poke_reg(zsock_t*, pid_t);

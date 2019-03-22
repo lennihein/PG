@@ -161,7 +161,7 @@ void func_exit(zsock_t* sock, pid_t pid)
 // based on whether or not tracee exited
 void func_continue(zsock_t* sock, pid_t pid)
 {
-    int code = __continue__(pid, &breakpoints);
+    int code = __continue__(pid);
     if(code == __EXIT__) func_exit(sock, pid);
     zstr_sendf(sock, "RETURN");
 }
@@ -174,7 +174,7 @@ void func_create_breakpoint(zsock_t* sock, pid_t pid)
 {
     zstr_send(sock, "");
     char* str = zstr_recv(sock);
-    __create_breakpoint__(pid, strtoull(str, NULL, 10), &breakpoints);
+    __create_breakpoint__(pid, strtoull(str, NULL, 10));
     zstr_sendf(sock, "RETURN");
     free(str);
 }
@@ -183,7 +183,7 @@ void func_create_breakpoint(zsock_t* sock, pid_t pid)
 // sends "RETURN <addr1> <addr2> ..."
 void func_show_breakpoints(zsock_t* sock, pid_t pid)
 {
-    zstr_sendf(sock, "RETURN %s", __show_breakpoints__(pid, &breakpoints));
+    zstr_sendf(sock, "RETURN %s", __show_breakpoints__(pid));
 }
 
 // todo: DD2
@@ -194,7 +194,7 @@ void func_remove_breakpoint(zsock_t* sock, pid_t pid)
 {
     zstr_send(sock, "");
     char* str = zstr_recv(sock);
-    __remove_breakpoint__(pid, strtoull(str, NULL, 10), &breakpoints);
+    __remove_breakpoint__(pid, strtoull(str, NULL, 10));
     zstr_sendf(sock, "RETURN");
     free(str);
 }
@@ -203,7 +203,7 @@ void func_remove_breakpoint(zsock_t* sock, pid_t pid)
 // based on whether or not tracee exited
 void func_singlestep(zsock_t* sock, pid_t pid)
 {
-    int code = __singlestep__(pid, &breakpoints);
+    int code = __singlestep__(pid);
     if(code == __EXIT__) func_exit(sock, pid);
     else zstr_sendf(sock, "RETURN");
 
@@ -215,7 +215,7 @@ void func_singlestep(zsock_t* sock, pid_t pid)
 // and if it was the interrupt before or after the kernal handles the call
 void func_next_syscall(zsock_t* sock, pid_t pid)
 {
-    int code = __next_syscall__(pid, &breakpoints);
+    int code = __next_syscall__(pid);
     if(code!=__EXIT__) zstr_sendf(sock, "RETURN %s", code?"LEAVE":"ENTER");
     else func_exit(sock, pid);
 }
