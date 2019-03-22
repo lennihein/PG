@@ -5,16 +5,13 @@ void __exit__(pid_t pid)
     kill(pid, SIGKILL);
 }
 
-int __continue__(pid_t pid)
+int __continue__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr)
 {
     ptrace(PTRACE_CONT, pid, NULL, NULL);
     int status;
     int err = waitpid(pid, &status, 0);
 
-    // todo: DD2
-    // check if breakpoint
-    // if breakpoint: restore old data
-    // and remove breakpoint
+    __check_for_breakpoint__(pid, breakpoints_ptr);
 
     return WIFEXITED(status)?__EXIT__:__RETURN__;
 }

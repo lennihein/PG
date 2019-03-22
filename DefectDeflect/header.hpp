@@ -43,7 +43,7 @@ pid_t init_tracee(char* str);
 void func_exit(zsock_t*, pid_t);
 void __exit__(pid_t pid);
 void func_continue(zsock_t*, pid_t);
-int __continue__(pid_t pid);
+int __continue__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr);
 void func_create_breakpoint(zsock_t*, pid_t);
 void __create_breakpoint__(pid_t pid, uint64_t addr, std::map<uint64_t, uint64_t>* breakpoints_ptr);
 void func_show_breakpoints(zsock_t*, pid_t);
