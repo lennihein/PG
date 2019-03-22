@@ -105,7 +105,7 @@ void __create_breakpoint__(pid_t pid, uint64_t addr)
     // save old data in breakpoint management
     breakpoints.insert({addr, __peek_addr__(pid, addr)});
     // write int3, followed by NOPs, into the memory
-    __poke_addr__(pid, addr, 0xffffffffffffffccu);
+    __poke_addr__(pid, addr, 0x90909090909090ccu);
 }
 
 int __remove_breakpoint__(pid_t pid, uint64_t addr)

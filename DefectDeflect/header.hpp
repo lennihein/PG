@@ -9,33 +9,12 @@
 #include <sys/wait.h>
 #include <czmq.h>
 #include <signal.h>
-#include <inttypes.h>   // uint64_t
+#include <inttypes.h>
 
 #include "constants.hpp"
 
 // #define NDEBUG   // uncomment for final build
 #include <assert.h> // assertions
-
-#define assert_null(STATEMENT) assert(!(STATEMENT))
-#define assert_no_err(STATEMENT) assert(!(STATEMENT==-1))
-#define assert_not_null(STATEMENT) assert(STATEMENT)
-
-// credit to David Sorkovsky from SO 
-// (https://stackoverflow.com/questions/3046889/)
-#ifndef NDEBUG 
-
-#define XXX_0()     fprintf(stderr, "Boop from %s:%i\n", __FILE__, __LINE__)
-#define XXX_1(A)    XXX_0();fprintf(stderr, "%s: %d\n", #A, A)
-
-#define boop_str(STR) XXX_0();fprintf(stderr, "%s: %s\n", #STR, STR)
-
-#define XXX_X(x,A,FUNC, ...)  FUNC  
-
-#define boop(...)   XXX_X(,##__VA_ARGS__,\
-                    XXX_1(__VA_ARGS__),\
-                    XXX_0(__VA_ARGS__)) 
-
-#endif
 
 zsock_t* init_net();
 pid_t init_tracee(char* str);
@@ -57,7 +36,7 @@ int __singlestep__(pid_t pid);
 void func_next_syscall(zsock_t*, pid_t);
 int __next_syscall__(pid_t pid);
 void func_inject_instructions(zsock_t*, pid_t);
-// todo: DD3
+// todo: DD3 - inject instructions
 void func_poke_reg(zsock_t*, pid_t);
 void __poke_reg__(pid_t pid, uint64_t reg, uint64_t data);
 void func_peek_reg(zsock_t*, pid_t);

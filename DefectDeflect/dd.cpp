@@ -73,9 +73,9 @@ zsock_t* init_net()
 {
     int err;
     zsock_t* sock = zsock_new(ZMQ_REP);
-    assert_not_null(sock);
+    assert(NULL!=sock);
     err = zsock_bind(sock, "tcp://127.0.0.1:5555");
-    assert_no_err(err);
+    assert(-1!=err);
     printf("> Serving %s\n", ENDPOINT);
     return sock;
 }
