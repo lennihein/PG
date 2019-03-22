@@ -161,7 +161,7 @@ void func_exit(zsock_t* sock, pid_t pid)
 // based on whether or not tracee exited
 void func_continue(zsock_t* sock, pid_t pid)
 {
-    int code = __continue__(pid);
+    int code = __continue__(pid, &breakpoints);
     if(code == __EXIT__) func_exit(sock, pid);
     zstr_sendf(sock, "RETURN");
 }
@@ -203,7 +203,7 @@ void func_remove_breakpoint(zsock_t* sock, pid_t pid)
 // based on whether or not tracee exited
 void func_singlestep(zsock_t* sock, pid_t pid)
 {
-    int code = __singlestep__(pid);
+    int code = __singlestep__(pid, &breakpoints);
     if(code == __EXIT__) func_exit(sock, pid);
     else zstr_sendf(sock, "RETURN");
 
@@ -215,7 +215,7 @@ void func_singlestep(zsock_t* sock, pid_t pid)
 // and if it was the interrupt before or after the kernal handles the call
 void func_next_syscall(zsock_t* sock, pid_t pid)
 {
-    int code = __next_syscall__(pid);
+    int code = __next_syscall__(pid, &breakpoints);
     if(code!=__EXIT__) zstr_sendf(sock, "RETURN %s", code?"LEAVE":"ENTER");
     else func_exit(sock, pid);
 }
