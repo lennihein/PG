@@ -1,5 +1,8 @@
 #include "header.hpp"
 
+// declare breakpoint management
+std::map<uint64_t, uint64_t> breakpoints;
+
 int main()
 {   
     zsock_t* sock;
@@ -171,7 +174,7 @@ void func_create_breakpoint(zsock_t* sock, pid_t pid)
 {
     zstr_send(sock, "");
     char* str = zstr_recv(sock);
-    // int code = __create_breakpoint__(pid, atoi(str));
+    __create_breakpoint__(pid, strtoull(str, NULL, 10), &breakpoints);
     zstr_sendf(sock, "RETURN");
     free(str);
 }
@@ -180,8 +183,7 @@ void func_create_breakpoint(zsock_t* sock, pid_t pid)
 // sends "RETURN <addr1> <addr2> ..."
 void func_show_breakpoints(zsock_t* sock, pid_t pid)
 {
-    // zstr_sendf(sock, "RETURN %s", __show_breakpoints__(pid));
-    zstr_send(sock, "RETURN");
+    zstr_sendf(sock, "RETURN %s", __show_breakpoints__(pid, &breakpoints));
 }
 
 // todo: DD2
@@ -192,9 +194,8 @@ void func_remove_breakpoint(zsock_t* sock, pid_t pid)
 {
     zstr_send(sock, "");
     char* str = zstr_recv(sock);
-    // int code = __remove_breakpoint__(pid, atoi(str));
-    int code = 0; // only stub
-    zstr_sendf(sock, "RETURN %s", code?"FAILURE":"SUCCESS");
+    __remove_breakpoint__(pid, strtoull(str, NULL, 10), &breakpoints);
+    zstr_sendf(sock, "RETURN");
     free(str);
 }
 

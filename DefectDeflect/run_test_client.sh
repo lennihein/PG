@@ -1,1 +1,1 @@
-nasm -f elf64 test_tracee.asm && ld -o tracee test_tracee.o && rm test_tracee.o && g++ -o client test_client.cpp -lzmq -lczmq -O0 -fno-stack-protector -no-pie && ./client && rm client && rm tracee
+nasm -f elf64 -g -F stabs test_tracee.asm && ld -o tracee test_tracee.o && g++ -o client test_client.cpp -lzmq -lczmq -O0 -fno-stack-protector -no-pie && ./client && rm client && rm tracee && rm test_tracee.o 

@@ -102,3 +102,44 @@ int __singlestep__(pid_t pid)
     return WIFEXITED(status)?__EXIT__:__RETURN__;
 
 }
+
+void __create_breakpoint__(pid_t pid, uint64_t addr, std::map<uint64_t, uint64_t>* breakpoints_ptr)
+{
+    // save old data in breakpoint management
+    breakpoints_ptr->insert({addr, __peek_addr__(pid, addr)});
+    // write int3, followed by NOPs, into the memory
+    __poke_addr__(pid, addr, 0xffffffffffffffccu);
+}
+
+void __remove_breakpoint__(pid_t pid, uint64_t addr, std::map<uint64_t, uint64_t>* breakpoints_ptr)
+{
+    std::map<uint64_t, uint64_t>::iterator breakpoint = breakpoints_ptr->find(addr);
+    if(breakpoint != breakpoints_ptr->end());
+    {
+        // restore original data
+        __poke_addr__(pid, addr, breakpoint->second);
+        // remove breakpoint from management
+        breakpoints_ptr->erase(breakpoint);
+    }
+    else
+    {
+        printf(" Breakpoint not found!");
+    }
+}
+
+void __show_breakpoints__(pid_t pid, std::map<uint64_t, uint64_t>* breakpoints_ptr)
+{
+    std::map<uint64_t, uint64_t>::iterator breakpoint;
+    char* result = malloc(sizeof(char)*(breakpoints_ptr->size()*39+1));
+    breakpoint = breakpoints_ptr->begin();
+    int offset = 0;
+    loop:
+        if(breakpoint == breakpoints_ptr->end) goto end;
+        int err = snprintf( result+offset, 40, "%#018" PRIx64 ": %#018" PRIx64 "\n", 
+                            breakpoint->first, breakpoint->second);
+        assert(err==39);
+        breakpoint++;
+        offset += 39;
+    goto loop;
+    end: return result;
+}
