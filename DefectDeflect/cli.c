@@ -45,16 +45,25 @@ void cli_routine()
     fprintf(stderr, "now init...");
     zsock_t* sock = init(target);
     
-    char* input = malloc(sizeof(char)*16);
+    char* input = malloc(sizeof(char)*26);
 
     loop:
+    printf("\n=================================================\n");
+    printf("Type one of the following options:\n");
+    printf("continue, exit,\n");
+    printf("peek_reg, poke_reg, peek_adr, poke_adr,\n");
+    printf("create_breakpoint, remove_breakpoint, show_breakpoints,\n");
+    printf("singlestep, next_syscall,\n");
+    printf("view_stack, inject_instructions, raise_signal\n");
 
-    scanf("%15s", input);
+    scanf("%25s", input);
+    convert(input);
 
     if(!strcmp(input,"PEEK_REG")) //peek_reg
     {
-        char* reg;
-        printf("type reg\n");
+        printf("entered\n");
+        char* reg = malloc(sizeof(char)*8);
+        printf("Type the register you want to peek in\n");
         scanf("%s",reg);
         uint64_t result = peek_reg(sock, reg);
         printf("%s: %lu",reg, result);
@@ -62,14 +71,14 @@ void cli_routine()
     }
     if(!strcmp(input,"POKE_REG")) //poke_reg
     {
-        char* reg;
+        char* reg = malloc(sizeof(char)*8);
         uint64_t data;
-        printf("type reg\n");
+        printf("Type the register you want to overwrite\n");
         scanf("%s", reg);
-        printf("type data\n");
+        printf("Type the data you want to overwrite\n");
         scanf("%lu", &data);
         poke_reg(sock, reg, data);
-        printf("poked succesfully\n");
+        printf("Poke succesful\n");
         goto loop;
 
     }
@@ -109,7 +118,8 @@ void cli_routine()
     }
     if(!strcmp(input, "SHOW_BREAKPOINTS"))  // show breakpoints
     {
-        char* string=show_breakpoints(sock);
+        char* string = malloc(sizeof(char)*256);
+        string=show_breakpoints(sock);
         printf("%s",string);
         free(string);
         goto loop;
@@ -135,7 +145,8 @@ void cli_routine()
     }
     if(!strcmp(input, "NEXT_SYSCALL"))   // next syscall
     {
-        char* string=next_syscall(sock);
+        char* string = malloc(sizeof(char)*8);
+        string=next_syscall(sock);
         if(!strcmp("EXIT",string))    // next_syscall reached end
         {
             zsock_destroy(&sock);
@@ -144,7 +155,8 @@ void cli_routine()
         }
         else                
         {
-            char* buf=cutoff(string);
+            char* buf = malloc(sizeof(char)*16);
+            buf=cutoff(string);
             if(!strcmp("ENTER",buf))            // syscall entry
             {
                 printf("syscall entry\n");
@@ -174,7 +186,8 @@ void cli_routine()
     }
     if(!strcmp(input, "CONTINUE"))
     {
-        char* string=singlestep(sock);
+        char* string = malloc(sizeof(char)*16);
+        string=singlestep(sock);
         if("EXIT"==string)    // reached end of code
         {
             destroy(sock);      
@@ -370,7 +383,8 @@ char* view_stack(zsock_t* sock)
 {
     int err = zstr_send(sock, "VIEW_STACK");
     assert(err!=-1);
-    char* string = zstr_recv(sock);
+    char* string = malloc(sizeof(char)*256);
+    string = zstr_recv(sock);
     assert(string);
     return cutoff(string); 
     
@@ -413,21 +427,13 @@ char* cutoff(char* string)  // cuts off "RETURN " at beginning
     }
 }
 
-char* convert(char* string) //small to caps and spaces to _ "peek reg" to "PEEK_REG"
+void convert(char* string) //small to caps and spaces to _ "peek reg" to "PEEK_REG"
 {
-    char buf[30];
-    strcpy(buf,string);
-    int i;
-    for(i=0; i<sizeof(string); i++)
+    for(int i=0; i<strlen(string); i++)
     {
-        if((int)buf[i]==32) //check if space
+        if((int)string[i]!=95&&(int)string[i]>=97&&(int)string[i]<=122) //check if not "_" and in range of ascii number a-z
         {
-            buf[i]=(char)95; //ascii number for "_"
-        }
-        else
-        {
-            buf[i]=(char)((int)buf[i]-32); //ascii number lower to upper case
+            string[i]=(char)((int)string[i]-32); //ascii number lower to upper case
         }
     }
-    return buf;
 }

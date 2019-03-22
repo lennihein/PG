@@ -24,6 +24,7 @@ char* next_syscall(zsock_t* sock);
 void inject_instructions(zsock_t* sock, uint64_t adr, char* payload);
 char* func_continue(zsock_t* sock);
 void func_exit(zsock_t* sock);
+void convert(char* string);
 
 # define R15	    "0"
 # define R14	    "8"
