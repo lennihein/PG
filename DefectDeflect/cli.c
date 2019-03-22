@@ -2,8 +2,20 @@
 
 #define TARGET "./tracee"
 
-int main()
+int main(int argc, char **argv) 
 {
+    // check for arguments
+    if(argc == 2)
+    {
+        if(strcmp(argv[1], "--standalone")==0)
+        {
+            printf("Standalone mode\n\n");
+            cli_routine();
+            return EXIT_SUCCESS;
+        }
+        printf("wut");
+    }
+
     int err;
     pid_t pid = fork();
     if(pid==-1) // error
@@ -54,7 +66,7 @@ void cli_routine()
     printf("peek_reg, poke_reg, peek_adr, poke_adr,\n");
     printf("create_breakpoint, remove_breakpoint, show_breakpoints,\n");
     printf("singlestep, next_syscall,\n");
-    printf("view_stack, inject_instructions, raise_signal\n");
+    printf("view_stack, inject_instructions, raise_signal\n\n");
 
     scanf("%25s", input);
     convert(input);

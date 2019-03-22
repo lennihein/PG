@@ -24,12 +24,10 @@ _start:
 
     ; sys_write
     mov RAX, 1
-    mov RAX, 1
     mov RDI, 1          ; stdout
     mov RSI, str   
     mov RDX, 12     
     syscall
-    mov RAX, 1
 
     call func
 
