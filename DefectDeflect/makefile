@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := run
 LIBS := -lzmq -lczmq
-CFLAGS := -g -W -Werror
+CFLAGS := -g -W -Werror -std=c++11
 
 dd.o: dd.cpp header.hpp
 	g++ -c -o dd.o dd.cpp $(CFLAGS) $(LIBS)
