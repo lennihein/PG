@@ -9,13 +9,15 @@ void __exit__(pid_t pid)
 
 int __continue__(pid_t pid)
 {
-    ptrace(PTRACE_CONT, pid, NULL, NULL);
     int status;
-    int err = waitpid(pid, &status, 0);
+    int err;
+    loop: ptrace(PTRACE_CONT, pid, NULL, NULL);    
+    err = waitpid(pid, &status, 0);
 
-    __check_for_breakpoint__(pid);
-
-    return WIFEXITED(status)?__EXIT__:__RETURN__;
+    if(WIFEXITED(status)) 
+        return __EXIT__;
+    if(!__check_for_breakpoint__(pid)) goto loop;
+    return __RETURN__;
 }
 
 int __next_syscall__(pid_t pid)
@@ -144,8 +146,10 @@ int __check_for_breakpoint__(pid_t pid)
 {
     // fetch rip position
     uint64_t rip = __peek_reg__(pid, RIP);
+    // 0xcc is 8 bit = 1 Byte long
+    rip -= 1;
     // if there was a breakpoint, restore old data
-    int res = __remove_breakpoint__(pid, --rip);
+    int res = __remove_breakpoint__(pid, rip);
     // check if last byte was interrupt, aka if there was a breakpoint
     if(res)
     {
