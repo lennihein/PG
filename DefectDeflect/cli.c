@@ -1,21 +1,19 @@
 #include "cli.h"
 
-#define TARGET "./a.out"
-
 int main(int argc, char **argv) 
 {
+    char* target = argv[1];
     // check for arguments
-    if(argc == 2)
+    if(argc == 3)
     {
-        if(strcmp(argv[1], "--standalone")==0)
+        if(strcmp(argv[2], "--standalone")==0)
         {
             printf("Standalone mode\n\n");
-            cli_routine();
+            cli_routine(target);
             return EXIT_SUCCESS;
         }
         printf("wut");
     }
-
     int err;
     pid_t pid = fork();
     if(pid==-1) // error
@@ -24,7 +22,7 @@ int main(int argc, char **argv)
     }
     if(pid)     // parent
     {
-        cli_routine();
+        cli_routine(target);
         waitpid(pid, NULL, 0);
         exit(EXIT_SUCCESS);
 
@@ -51,19 +49,21 @@ int main(int argc, char **argv)
     }
 }
 
-void cli_routine()
+void cli_routine(char* target)
 {
-    char* target = TARGET;
     fprintf(stderr, "now init...");
     zsock_t* sock = init(target);
     
     char* input = malloc(sizeof(char)*26);
 
     loop:
-    printf("\n=================================================\n");
+    printf("\nPress enter to continue\n");
+    char enter = 0;
+    while (enter!='\r' && enter!= '\n') {enter=getchar();}
+    printf("\n=================================================\n\n");
     printf("Type one of the following options:\n");
     printf("continue, exit,\n");
-    printf("peek_reg, poke_reg, peek_adr, poke_adr,\n");
+    printf("peek_reg, poke_reg, peek_addr, poke_addr,\n");
     printf("create_breakpoint, remove_breakpoint, show_breakpoints,\n");
     printf("singlestep, next_syscall,\n");
     printf("view_stack, inject_instructions, raise_signal\n\n");
@@ -73,12 +73,11 @@ void cli_routine()
 
     if(!strcmp(input,"PEEK_REG")) //peek_reg
     {
-        printf("entered\n");
         char* reg = malloc(sizeof(char)*8);
         printf("Type the register you want to peek in\n");
         scanf("%s",reg);
         uint64_t result = peek_reg(sock, reg);
-        printf("%s: %lu",reg, result);
+        printf("%s: %lu\n",reg, result);
         goto loop;
     }
     if(!strcmp(input,"POKE_REG")) //poke_reg
@@ -97,23 +96,35 @@ void cli_routine()
     if(!strcmp(input, "VIEW_STACK")) //view_stack
     {
         char* string=view_stack(sock);
-        printf("%s",string);
+        printf("%s\n",string);
         free(string);
         goto loop;
     }
-    if(!strcmp(input, "PEEK_ADR")) //peek_adr
+    if(!strcmp(input, "PEEK_ADDRESS")) //peek_addr
     {
-        uint64_t adr;
-        printf("type reg\n");
-        scanf("%lu",&adr);
-        uint64_t result = peek_reg(sock, (char*)adr);
-        printf("%lu: %lu\n",adr, result);
+        char* addr = malloc(sizeof(char)*20);
+        printf("Type the address you want to overwrite\n");
+        scanf("%s",addr);
+        uint64_t result = peek_reg(sock,addr);
+        printf("%s: %lu\n",addr, result);
+        goto loop;
+    }
+    if(!strcmp(input, "POKE_ADDRESS")) //poke_addr
+    {
+        char* addr = malloc(sizeof(char)*20);
+        uint64_t data;
+        printf("Type the adress you want to overwrite\n");
+        scanf("%s", addr);
+        printf("Type the data you want to overwrite\n");
+        scanf("%lu", &data);
+        poke_reg(sock, addr, data);
+        printf("Poke succesful\n");
         goto loop;
     }
     if(!strcmp(input, "RAISE_SIGNAL"))      //raise signal
     {
         int signal;
-        printf("type signal number\n");
+        printf("Type the signal number\n");
         scanf("%i",&signal);
         raise_signal(sock, signal);
         printf("signal raised\n");
@@ -122,7 +133,7 @@ void cli_routine()
     if(!strcmp(input, "CREATE_BREAKPOINT")) // create breakpoint
     {
         char* addr = malloc(sizeof(char)*32);
-        printf("type adr\n");
+        printf("type addr\n");
         scanf("%31s",addr);
         create_breakpoint(sock, addr);
         printf("breakpoint set\n");
@@ -140,7 +151,7 @@ void cli_routine()
     if(!strcmp(input, "REMOVE_BREAKPOINT")) // remove breakpoint
     {
         char* addr = malloc(sizeof(char)*32);
-        printf("type adr\n");
+        printf("type addr\n");
         scanf("%31s",addr);
         remove_breakpoint(sock,addr);
         printf("breakpoint removed\n");
@@ -188,13 +199,13 @@ void cli_routine()
     }
     if(!strcmp(input, "INJECT_INSTRUCTIONS"))
     {
-        uint64_t adr;
+        uint64_t addr;
         char* payload;
-        printf("type adr\n");
-        scanf("%lu",&adr);
+        printf("type addr\n");
+        scanf("%lu",&addr);
         printf("type payload\n");
         scanf("%s",payload);
-        inject_instructions(sock, adr, payload);
+        inject_instructions(sock, addr, payload);
         printf("instructions injected\n");
         goto loop;
     }
@@ -283,12 +294,12 @@ uint64_t peek_reg(zsock_t* sock, char* reg)
     return erg;
 }
 
-uint64_t peek_adr(zsock_t* sock, char* adr)
+uint64_t peek_addr(zsock_t* sock, char* addr)
 {
-    int err = zstr_send(sock, "PEEK_ADR");
+    int err = zstr_send(sock, "PEEK_addr");
     assert(err!=-1);
     char* string = zstr_recv(sock);
-    err = zstr_send(sock, adr);
+    err = zstr_send(sock, addr);
     assert(err!=-1);
     string = zstr_recv(sock);
     assert(string);
@@ -314,12 +325,12 @@ void poke_reg(zsock_t* sock, char* reg, uint64_t data)
 
 }
 
-void poke_adr(zsock_t* sock, uint64_t adr, uint64_t data)
+void poke_addr(zsock_t* sock, uint64_t addr, uint64_t data)
 {
-    int err = zstr_send(sock, "POKE_ADR");
+    int err = zstr_send(sock, "POKE_addr");
     assert(err!=-1);
     char* string = zstr_recv(sock);
-    err = zstr_send(sock, (char*)adr);
+    err = zstr_send(sock, (char*)addr);
     assert(err!=-1);
     string = zstr_recv(sock);
     err = zstr_send(sock, (char*)data);
@@ -379,12 +390,12 @@ char* next_syscall(zsock_t* sock)
     return string;
 }
 
-void inject_instructions(zsock_t* sock, uint64_t adr, char* payload)
+void inject_instructions(zsock_t* sock, uint64_t addr, char* payload)
 {
     int err = zstr_send(sock, "INJECT_INSTRUCTIONS");
     assert(err!=-1);
     char* string = zstr_recv(sock);
-    err = zstr_send(sock, (char*)adr);
+    err = zstr_send(sock, (char*)addr);
     assert(err!=-1);
     string = zstr_recv(sock);
     err = zstr_send(sock, payload);
