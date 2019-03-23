@@ -121,11 +121,12 @@ void cli_routine()
     }
     if(!strcmp(input, "CREATE_BREAKPOINT")) // create breakpoint
     {
-        uint64_t adr;
+        char* addr = malloc(sizeof(char)*32);
         printf("type adr\n");
-        scanf("%lu",&adr);
-        create_breakpoint(sock, adr);
+        scanf("%31s",addr);
+        create_breakpoint(sock, addr);
         printf("breakpoint set\n");
+        free(addr);
         goto loop;
     }
     if(!strcmp(input, "SHOW_BREAKPOINTS"))  // show breakpoints
@@ -138,11 +139,12 @@ void cli_routine()
     }
     if(!strcmp(input, "REMOVE_BREAKPOINT")) // remove breakpoint
     {
-        uint64_t adr;
+        char* addr = malloc(sizeof(char)*32);
         printf("type adr\n");
-        scanf("%lu",&adr);
-        remove_breakpoint(sock,adr);
+        scanf("%31s",addr);
+        remove_breakpoint(sock,addr);
         printf("breakpoint removed\n");
+        free(addr);
         goto loop;
     }
     if(!strcmp(input, "SINGLESTEP"))    // singlestep
@@ -326,12 +328,12 @@ void poke_adr(zsock_t* sock, uint64_t adr, uint64_t data)
 
 }
 
-void create_breakpoint(zsock_t* sock, uint64_t adr)
+void create_breakpoint(zsock_t* sock, char* addr)
 {
     int err = zstr_send(sock, "CREATE_BREAKPOINT");
     assert(err!=-1);
     char* string = zstr_recv(sock);
-    err = zstr_send(sock, (char*)adr);
+    err = zstr_send(sock, addr);
     assert(err!=-1);
     string = zstr_recv(sock);
     free(string);
@@ -347,12 +349,12 @@ char* show_breakpoints(zsock_t* sock)
     return string;
 }
 
-void remove_breakpoint(zsock_t* sock, uint64_t adr)
+void remove_breakpoint(zsock_t* sock, char* addr)
 {
     int err = zstr_send(sock, "REMOVE_BREAKPOINT");
     assert(err!=-1);
     char* string = zstr_recv(sock);
-    err = zstr_send(sock, (char*)adr);
+    err = zstr_send(sock, addr);
     assert(err!=-1);
     string = zstr_recv(sock);
     free(string);
