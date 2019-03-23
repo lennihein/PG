@@ -1,6 +1,6 @@
 #include "cli.h"
 
-#define TARGET "./tracee"
+#define TARGET "./a.out"
 
 int main(int argc, char **argv) 
 {
@@ -200,14 +200,16 @@ void cli_routine()
     }
     if(!strcmp(input, "CONTINUE"))
     {
-        char* string = malloc(sizeof(char)*16);
-        string=func_continue(sock);
-        if("EXIT"==string)    // reached end of code
+        char* string=func_continue(sock);
+        if(!strcmp(string, "EXIT"))    // reached end of code
         {
-            destroy(sock);      
+            free(string);
+            zsock_destroy(&sock);
+            return;    
         }
         else
         {
+            free(string);
             printf("tracee continued\n");
         }        
         goto loop;
