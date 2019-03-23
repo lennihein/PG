@@ -201,7 +201,7 @@ void cli_routine()
     if(!strcmp(input, "CONTINUE"))
     {
         char* string = malloc(sizeof(char)*16);
-        string=singlestep(sock);
+        string=func_continue(sock);
         if("EXIT"==string)    // reached end of code
         {
             destroy(sock);      
