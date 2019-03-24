@@ -21,7 +21,7 @@ char* show_breakpoints(zsock_t* sock);
 void remove_breakpoint(zsock_t* sock, char* addr);
 char* singlestep(zsock_t* sock);
 char* next_syscall(zsock_t* sock);
-void inject_instructions(zsock_t* sock, uint64_t adr, char* payload);
+void inject_instructions(zsock_t* sock, char* payload);
 char* func_continue(zsock_t* sock);
 void func_exit(zsock_t* sock);
 void convert(char* string);
