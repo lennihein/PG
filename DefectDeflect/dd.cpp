@@ -229,7 +229,7 @@ void func_inject_instructions(zsock_t* sock, pid_t pid)
     zstr_send(sock, "");
     // add '0xcc' to end of instructions
     char* str_without_interrupt = zstr_recv(sock);
-    char* str = malloc(strlen(str_without_interrupt)+3);
+    char* str = (char*) malloc(strlen(str_without_interrupt)+3);
     memcpy(str, str_without_interrupt, strlen(str));
     memcpy(str+strlen(str_without_interrupt), "cc", 2);
     str[strlen(str_without_interrupt)+2] = '\0';
@@ -238,7 +238,7 @@ void func_inject_instructions(zsock_t* sock, pid_t pid)
     int length = strlen(str)/2;
     // get smallest large enough multiple of 8
     int padded_length = ((length/8) + 1) * 8;
-    uint8_t* payload = malloc(sizeof(uint8_t)*padded_length);
+    uint8_t* payload = (uint8_t*) malloc(sizeof(uint8_t)*padded_length);
     char buf[3];
     buf[2] = '\0';
     // copy converted instruction bytes into array
@@ -252,7 +252,7 @@ void func_inject_instructions(zsock_t* sock, pid_t pid)
     {
         buf[i] = 0x90;
     }
-    __inject__instructions(pid, (uint64_t*) payload, length)
+    __inject__instructions(pid, (uint64_t*) payload, length);
     zstr_send(sock, "RETURN");
     free(str);
     free(payload);
