@@ -162,3 +162,24 @@ int __check_for_breakpoint__(pid_t pid)
         return 0;
     }
 }
+
+void __inject__instructions(pid_t pid, uint64_t* payload, int length)
+{
+    uint64_t rip =  __peek_reg__(pid, RIP);
+    uint64_t* backup = (uint64_t*) malloc(length);
+    for(int i=0; i<length; i+=8)
+    {
+        backup[i/8] = __peek_addr__(pid, rip+i);
+    }
+    for(int i=0; i<length; i+=8)
+    {
+        __poke_addr__(pid, rip+i, payload[i/8]);
+    }
+    ptrace(PTRACE_CONT, pid, NULL, NULL);
+    waitpid(pid, NULL, 0);
+    __poke_reg__(pid, RIP, rip);
+    for(int i=0; i<length; i+=8)
+    {
+        __poke_addr__(pid, rip+i, backup[i/8]);
+    }
+}

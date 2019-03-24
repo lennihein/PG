@@ -36,7 +36,7 @@ int __singlestep__(pid_t pid);
 void func_next_syscall(zsock_t*, pid_t);
 int __next_syscall__(pid_t pid);
 void func_inject_instructions(zsock_t*, pid_t);
-// todo: DD3 - inject instructions
+void __inject__instructions(pid_t pid, uint64_t* payload, int length);
 void func_poke_reg(zsock_t*, pid_t);
 void __poke_reg__(pid_t pid, uint64_t reg, uint64_t data);
 void func_peek_reg(zsock_t*, pid_t);

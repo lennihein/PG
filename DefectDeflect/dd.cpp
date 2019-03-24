@@ -212,7 +212,7 @@ void func_singlestep(zsock_t* sock, pid_t pid)
 // JUMPS PAST BREAKPOINTS ?
 // sends "RETURN [ENTER/LEAVE]" or "EXIT"
 // based on whether or not a next syscall was even existent
-// and if it was the interrupt before or after the kernal handles the call
+// and if it was the interrupt before or after the kernel handles the call
 void func_next_syscall(zsock_t* sock, pid_t pid)
 {
     int code = __next_syscall__(pid);
@@ -222,20 +222,40 @@ void func_next_syscall(zsock_t* sock, pid_t pid)
 
 // todo: DD3
 // sends ""
-// receives address (decimal to str)
-// sends ""
-// receives payload (decimal to str) ?
+// receives payload (hex to str)
 // sends "RETURN"
 void func_inject_instructions(zsock_t* sock, pid_t pid)
 {
     zstr_send(sock, "");
-    char* str1 = zstr_recv(sock);
-    zstr_send(sock, "");
-    char* str2 = zstr_recv(sock);
-    // __inject__instructions(...)
+    // add '0xcc' to end of instructions
+    char* str_without_interrupt = zstr_recv(sock);
+    char* str = malloc(strlen(str_without_interrupt)+3);
+    memcpy(str, str_without_interrupt, strlen(str));
+    memcpy(str+strlen(str_without_interrupt), "cc", 2);
+    str[strlen(str_without_interrupt)+2] = '\0';
+    free(str_without_interrupt);
+    // get length in bytes
+    int length = strlen(str)/2;
+    // get smallest large enough multiple of 8
+    int padded_length = ((length/8) + 1) * 8;
+    uint8_t* payload = malloc(sizeof(uint8_t)*padded_length);
+    char buf[3];
+    buf[2] = '\0';
+    // copy converted instruction bytes into array
+    for(int i = 0; i<length; i++)
+    {
+        memcpy(buf, str+(i*2), 2);
+        payload[i] = (uint8_t) strtoull(buf, NULL, 16);
+    }
+    // pad with NOP instructions
+    for(int i=length; i<padded_length; i++)
+    {
+        buf[i] = 0x90;
+    }
+    __inject__instructions(pid, (uint64_t*) payload, length)
     zstr_send(sock, "RETURN");
-    free(str1);
-    free(str2);
+    free(str);
+    free(payload);
 }
 
 // sends ""
