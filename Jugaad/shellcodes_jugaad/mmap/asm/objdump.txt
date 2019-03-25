@@ -1,0 +1,14 @@
+
+mmap:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000400080 <_start>:
+  400080:	bf 00 00 00 00       	mov    edi,0x0
+  400085:	be 00 00 40 00       	mov    esi,0x400000
+  40008a:	ba 07 00 00 00       	mov    edx,0x7
+  40008f:	41 ba 22 00 00 00    	mov    r10d,0x22
+  400095:	b8 09 00 00 00       	mov    eax,0x9
+  40009a:	0f 05                	syscall 
+  40009c:	c3                   	ret    
