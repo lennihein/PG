@@ -164,6 +164,7 @@ void cli_routine(char* target)
             free(input);
             return;
         }
+        printf("stepped\n");
         goto loop;
     }
     if(!strcmp(input, "NEXT_SYSCALL"))   // next syscall
