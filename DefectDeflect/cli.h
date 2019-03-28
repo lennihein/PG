@@ -25,6 +25,7 @@ void inject_instructions(zsock_t* sock, char* payload);
 char* func_continue(zsock_t* sock);
 void func_exit(zsock_t* sock);
 void convert(char* string);
+char* convertreg(char* reg);
 
 # define R15	    "0"
 # define R14	    "8"

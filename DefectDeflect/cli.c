@@ -71,9 +71,11 @@ void cli_routine(char* target)
 
     if(!strcmp(input,"PEEK_REG")) //peek_reg
     {
-        char* reg = malloc(sizeof(char)*8);
+        char* reg = malloc(sizeof(char)*9);
         printf("Type the register you want to peek in\n");
         scanf("%s",reg);
+        convert(reg);                   //lower to upper case
+        strcpy(reg,convertreg(reg));    //char* to int
         uint64_t result = peek_reg(sock, reg);
         printf("%s: %lu\n",reg, result);
         goto loop;
@@ -84,6 +86,8 @@ void cli_routine(char* target)
         uint64_t data;
         printf("Type the register you want to overwrite\n");
         scanf("%s", reg);
+        convert(reg);                   //lower to upper case
+        strcpy(reg,convertreg(reg));    //char* to int
         printf("Type the data you want to overwrite\n");
         scanf("%lu", &data);
         poke_reg(sock, reg, data);
@@ -456,4 +460,36 @@ void convert(char* string) //small to caps and spaces to _ "peek reg" to "PEEK_R
             string[i]=(char)((int)string[i]-32); //ascii number lower to upper case
         }
     }
+}
+
+char* convertreg(char* reg) //converts register string to int (RAX to 80)
+{
+    char* str = malloc(sizeof(char)*9);
+    if(!strcmp(reg,"R15")){return "0";}
+    if(!strcmp(reg,"R14")){return "8";}
+    if(!strcmp(reg,"R13")){return "16";}
+    if(!strcmp(reg,"R12")){return "24";}
+    if(!strcmp(reg,"RBP")){return "32";}
+    if(!strcmp(reg,"R11")){return "40";}
+    if(!strcmp(reg,"R10")){return "48";}
+    if(!strcmp(reg,"R9")){return "56";}
+    if(!strcmp(reg,"R8")){return "72";}
+    if(!strcmp(reg,"RAX")){return "80";}   
+    if(!strcmp(reg,"RCX")){return "88";}
+    if(!strcmp(reg,"RDX")){return "96";} 
+    if(!strcmp(reg,"RSI")){return "104";}
+    if(!strcmp(reg,"RDI")){return "112";}
+    if(!strcmp(reg,"ORIG_RAX")){return "120";}
+    if(!strcmp(reg,"RIP")){return "128";}
+    if(!strcmp(reg,"CS")){return "136";}
+    if(!strcmp(reg,"EFLAGS")){return "144";}
+    if(!strcmp(reg,"RSP")){return "152";}
+    if(!strcmp(reg,"SS")){return "160";}
+    if(!strcmp(reg,"FS_BASE")){return "168";}
+    if(!strcmp(reg,"GS_BASE")){return "176";}
+    if(!strcmp(reg,"DS")){return "184";}
+    if(!strcmp(reg,"ES")){return "192";}
+    if(!strcmp(reg,"FS")){return "200";}
+    if(!strcmp(reg,"GS")){return "208";}
+    return "ERROR";  //if none of the above send error
 }
