@@ -1,0 +1,39 @@
+
+mmap_clone:     Dateiformat elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000401000 <.text>:
+  401000:	48 8d 3d 39 00 00 00 	lea    0x39(%rip),%rdi        # 0x401040
+  401007:	eb 00                	jmp    0x401009
+  401009:	57                   	push   %rdi
+  40100a:	eb 16                	jmp    0x401022
+  40100c:	48 8d b0 f8 ff 3f 00 	lea    0x3ffff8(%rax),%rsi
+  401013:	8f 06                	popq   (%rsi)
+  401015:	bf 00 09 01 00       	mov    $0x10900,%edi
+  40101a:	b8 38 00 00 00       	mov    $0x38,%eax
+  40101f:	0f 05                	syscall 
+  401021:	cc                   	int3   
+  401022:	bf 00 00 00 00       	mov    $0x0,%edi
+  401027:	be 00 00 40 00       	mov    $0x400000,%esi
+  40102c:	ba 07 00 00 00       	mov    $0x7,%edx
+  401031:	41 ba 22 00 00 00    	mov    $0x22,%r10d
+  401037:	b8 09 00 00 00       	mov    $0x9,%eax
+  40103c:	0f 05                	syscall 
+  40103e:	eb cc                	jmp    0x40100c
+  401040:	eb 0c                	jmp    0x40104e
+  401042:	48                   	rex.W
+  401043:	65 6c                	gs insb (%dx),%es:(%rdi)
+  401045:	6c                   	insb   (%dx),%es:(%rdi)
+  401046:	6f                   	outsl  %ds:(%rsi),(%dx)
+  401047:	20 57 6f             	and    %dl,0x6f(%rdi)
+  40104a:	72 6c                	jb     0x4010b8
+  40104c:	64 0a b8 01 00 00 00 	or     %fs:0x1(%rax),%bh
+  401053:	bf 01 00 00 00       	mov    $0x1,%edi
+  401058:	48 8d 35 e3 ff ff ff 	lea    -0x1d(%rip),%rsi        # 0x401042
+  40105f:	ba 0c 00 00 00       	mov    $0xc,%edx
+  401064:	0f 05                	syscall 
+  401066:	bf 00 00 00 00       	mov    $0x0,%edi
+  40106b:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  401070:	0f 05                	syscall 

@@ -1,0 +1,55 @@
+
+mmap_clone:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000400080 <_start>:
+  400080:	48 8d 3d 39 00 00 00 	lea    rdi,[rip+0x39]        # 4000c0 <thread_funk>
+  400087:	eb 00                	jmp    400089 <thread_create1>
+
+0000000000400089 <thread_create1>:
+  400089:	57                   	push   rdi
+  40008a:	eb 16                	jmp    4000a2 <get_stack>
+
+000000000040008c <thread_create2>:
+  40008c:	48 8d b0 f8 1f 40 00 	lea    rsi,[rax+0x401ff8]
+  400093:	8f 06                	pop    QWORD PTR [rsi]
+  400095:	bf 00 09 01 00       	mov    edi,0x10900
+  40009a:	b8 38 00 00 00       	mov    eax,0x38
+  40009f:	0f 05                	syscall 
+  4000a1:	cc                   	int3   (Int 3 hier sollte ehr auf c3 -> also return gesetzt werden, dadruch springen wir zur Rücksprungaddsresse des testproc und child führt payload aus)
+
+00000000004000a2 <get_stack>:
+  4000a2:	bf 00 00 00 00       	mov    edi,0x0
+  4000a7:	be 00 20 40 00       	mov    esi,0x402000
+  4000ac:	ba 07 00 00 00       	mov    edx,0x7
+  4000b1:	41 ba 22 00 00 00    	mov    r10d,0x22
+  4000b7:	b8 09 00 00 00       	mov    eax,0x9
+  4000bc:	0f 05                	syscall 
+  4000be:	eb cc                	jmp    40008c <thread_create2>
+
+00000000004000c0 <thread_funk>:
+  4000c0:	eb 0c                	jmp    4000ce <MainPayload>
+
+00000000004000c2 <str>:
+  4000c2:	48                   	rex.W
+  4000c3:	65 6c                	gs ins BYTE PTR es:[rdi],dx
+  4000c5:	6c                   	ins    BYTE PTR es:[rdi],dx
+  4000c6:	6f                   	outs   dx,DWORD PTR ds:[rsi]
+  4000c7:	20 57 6f             	and    BYTE PTR [rdi+0x6f],dl
+  4000ca:	72 6c                	jb     400138 <MainPayload.exit+0x50>
+  4000cc:	64 0a b8 01 00 00 00 	or     bh,BYTE PTR fs:[rax+0x1]
+
+00000000004000ce <MainPayload>:
+  4000ce:	b8 01 00 00 00       	mov    eax,0x1
+  4000d3:	bf 01 00 00 00       	mov    edi,0x1
+  4000d8:	48 8d 35 e3 ff ff ff 	lea    rsi,[rip+0xffffffffffffffe3]        # 4000c2 <str>
+  4000df:	ba 0c 00 00 00       	mov    edx,0xc
+  4000e4:	0f 05                	syscall 
+  4000e6:	eb e6                	jmp    4000ce <MainPayload>   (Das hier kann weggelassen werden)
+
+00000000004000e8 <MainPayload.exit>:
+  4000e8:	bf 00 00 00 00       	mov    edi,0x0
+  4000ed:	b8 3c 00 00 00       	mov    eax,0x3c
+  4000f2:	0f 05                	syscall 

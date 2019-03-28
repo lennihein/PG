@@ -1,0 +1,73 @@
+
+mmap_clone:     Dateiformat elf64-x86-64
+
+
+Disassembly of section .note.gnu.property:
+
+00000000004000e8 <.note.gnu.property>:
+  4000e8:	04 00                	add    al,0x0
+  4000ea:	00 00                	add    BYTE PTR [rax],al
+  4000ec:	10 00                	adc    BYTE PTR [rax],al
+  4000ee:	00 00                	add    BYTE PTR [rax],al
+  4000f0:	05 00 00 00 47       	add    eax,0x47000000
+  4000f5:	4e 55                	rex.WRX push rbp
+  4000f7:	00 01                	add    BYTE PTR [rcx],al
+  4000f9:	00 00                	add    BYTE PTR [rax],al
+  4000fb:	c0 04 00 00          	rol    BYTE PTR [rax+rax*1],0x0
+  4000ff:	00 01                	add    BYTE PTR [rcx],al
+  400101:	00 00                	add    BYTE PTR [rax],al
+  400103:	00 00                	add    BYTE PTR [rax],al
+  400105:	00 00                	add    BYTE PTR [rax],al
+	...
+
+Disassembly of section .text:
+
+0000000000401000 <_start>:
+  401000:	48 8d 3d 3a 00 00 00 	lea    rdi,[rip+0x3a]        # 401041 <thread_funk>
+  401007:	eb 00                	jmp    401009 <thread_create1>
+
+0000000000401009 <thread_create1>:
+  401009:	57                   	push   rdi
+  40100a:	eb 16                	jmp    401022 <get_stack>
+
+000000000040100c <thread_create2>:
+  40100c:	48 8d b0 f8 0f 00 00 	lea    rsi,[rax+0xff8]
+  401013:	8f 06                	pop    QWORD PTR [rsi]
+  401015:	bf 00 09 01 00       	mov    edi,0x10900
+  40101a:	b8 38 00 00 00       	mov    eax,0x38
+  40101f:	0f 05                	syscall 
+  401021:	cc                   	int3   
+
+0000000000401022 <get_stack>:
+  401022:	bf 00 00 00 00       	mov    edi,0x0
+  401027:	be 00 10 00 00       	mov    esi,0x1000
+  40102c:	ba 07 00 00 00       	mov    edx,0x7
+  401031:	41 ba 22 00 00 00    	mov    r10d,0x22
+  401037:	b8 09 00 00 00       	mov    eax,0x9
+  40103c:	0f 05                	syscall 
+  40103e:	90                   	nop
+  40103f:	eb cb                	jmp    40100c <thread_create2>
+
+0000000000401041 <thread_funk>:
+  401041:	eb 0c                	jmp    40104f <MainPayload>
+
+0000000000401043 <str>:
+  401043:	48                   	rex.W
+  401044:	65 6c                	gs ins BYTE PTR es:[rdi],dx
+  401046:	6c                   	ins    BYTE PTR es:[rdi],dx
+  401047:	6f                   	outs   dx,DWORD PTR ds:[rsi]
+  401048:	20 57 6f             	and    BYTE PTR [rdi+0x6f],dl
+  40104b:	72 6c                	jb     4010b9 <MainPayload.exit+0x52>
+  40104d:	64 0a      	or     bh,BYTE PTR fs:[rax+0x1]
+
+000000000040104f <MainPayload>:
+  40104f:	b8 01 00 00 00       	mov    eax,0x1
+  401054:	bf 01 00 00 00       	mov    edi,0x1
+  401059:	48 8d 35 e3 ff ff ff 	lea    rsi,[rip+0xffffffffffffffe3]        # 401043 <str>
+  401060:	ba 0c 00 00 00       	mov    edx,0xc
+  401065:	0f 05                	syscall 
+
+0000000000401067 <MainPayload.exit>:
+  401067:	bf 00 00 00 00       	mov    edi,0x0
+  40106c:	b8 3c 00 00 00       	mov    eax,0x3c
+  401071:	0f 05                	syscall 
