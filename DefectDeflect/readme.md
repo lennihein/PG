@@ -34,5 +34,6 @@ When everything is set up a choice of different commands are shown.
 'poke_reg' and then '80' for Register RAX. Next input will be the data you want to overwrite it with.
 *The data input has to be decimal numbers (exception is 'inject_instructions' payload)
 *addresses are also refered to with decimal numbers.
-*The input is not case sensitive.
+*The input is not case sensitive
+
 Output of the Tracee will be found in `log.log`, alongside some Log from the Debugging Server
