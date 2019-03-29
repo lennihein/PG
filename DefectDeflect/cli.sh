@@ -1,1 +1,1 @@
-nasm -f elf64 -g -F stabs test_tracee.asm && ld -o tracee test_tracee.o && gcc -o cli cli.c -lzmq -lczmq -Werror && make compile && ./cli ./tracee && rm cli && rm tracee && make clean && rm test_tracee.o
+gcc -o cli cli.c -lzmq -lczmq -Werror

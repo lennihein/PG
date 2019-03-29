@@ -1,54 +1,38 @@
-# DefectDeflect
+## readme
 
-## TODO:
+The debugger was tested on a fresh Ubuntu 18.10 
 
-endptr bla
+### setup
 
-## Zero Message Queue
+Go to directory /DefectDeflect and run the following console commands:
 
-### Installation of Zero Message Queue
+    chmod +x setup.sh
+    sudo ./setup.sh
 
-Für Ubuntu 18.10
+### compile Debugger Server
 
-```
-sudo apt-get update
-sudo apt-get install autoconf -y
-sudo apt-get install gcc -y
-sudo apt-get install g++ -y
-sudo apt-get install cmake -y
-sudo apt-get install libtool -y 
-sudo apt-get install pkg-config -y
-sudo apt-get install git -y
-git clone https://github.com/zeromq/libzmq.git
-cd libzmq
-./autogen.sh
-./configure
-make
-sudo make install
-sudo ldconfig
-cd ..
-git clone git://github.com/zeromq/czmq.git
-cd czmq
-./autogen.sh
-./configure
-make
-sudo make install
-sudo ldconfig
-cd ..
-rm libzmq -r -f
-rm czmq -r -f
-```
+    make compile
 
-### CZMQ API 
+### compile CLI
 
-> http://czmq.zeromq.org/czmq4-0:czmq
+    chmod +x cli.sh
+    sudo ./cli.sh
 
-- `zsock_t* zsock_new_req (const char *endpoint);`
+### execute CLI
 
-- `zsock_t* zsock_new_rep (const char *endpoint);`
+In directory /DefectDeflect run the following command to start debugging <TARGET>:
 
-- `char* zstr_recv (void *source);`
+    ./cli <TARGET>
 
-- `int zstr_send (void *dest, const char *string);`
+### utilize 
 
-- `void zsock_destroy (zsock_t **self_p);`
+Once the cli is exectued it will run the debugger.
+Messages sent to the cli will be redirected to the debugger and then executed.
+
+When everything is set up a choice of different commands are shown.
+*For example if you want to poke in register RAX type:
+'poke_reg' and then '80' for Register RAX. Next input will be the data you want to overwrite it with.
+*The data input has to be decimal numbers (exception is 'inject_instructions' payload)
+*addresses are also refered to with decimal numbers.
+*The input is not case sensitive.
+Output of the Tracee will be found in `log.log`, alongside some Log from the Debugging Server
