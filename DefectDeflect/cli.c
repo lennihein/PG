@@ -76,6 +76,11 @@ void cli_routine(char* target)
         scanf("%s",reg);
         convert(reg);                   //lower to upper case
         strcpy(reg,convertreg(reg));    //char* to int
+        if(!strcmp(reg,"ERROR"))
+        {
+            printf("not a register\n");
+            goto loop;
+        }
         uint64_t result = peek_reg(sock, reg);
         printf("%s: %lu\n",reg, result);
         goto loop;
@@ -451,20 +456,21 @@ char* cutoff(char* string)  // cuts off "RETURN " at beginning
     }
 }
 
-void convert(char* string) //small to caps and spaces to _ "peek reg" to "PEEK_REG"
+void convert(char* string) // small to caps and spaces to _ "peek reg" to "PEEK_REG"
 {
     for(int i=0; i<strlen(string); i++)
     {
-        if((int)string[i]!=95&&(int)string[i]>=97&&(int)string[i]<=122) //check if not "_" and in range of ascii number a-z
+        if((int)string[i]!=95&&(int)string[i]>=97&&(int)string[i]<=122) // check if not "_" and in range of ascii number a-z
         {
-            string[i]=(char)((int)string[i]-32); //ascii number lower to upper case
+            string[i]=(char)((int)string[i]-32); // ascii number lower to upper case
         }
     }
 }
 
-char* convertreg(char* reg) //converts register string to int (RAX to 80)
+char* convertreg(char* reg) // converts register string to int (RAX to 80)
 {
     char* str = malloc(sizeof(char)*9);
+    // check for reg as string
     if(!strcmp(reg,"R15")){return "0";}
     if(!strcmp(reg,"R14")){return "8";}
     if(!strcmp(reg,"R13")){return "16";}
@@ -491,5 +497,10 @@ char* convertreg(char* reg) //converts register string to int (RAX to 80)
     if(!strcmp(reg,"ES")){return "192";}
     if(!strcmp(reg,"FS")){return "200";}
     if(!strcmp(reg,"GS")){return "208";}
-    return "ERROR";  //if none of the above send error
+    // check for reg as int
+    if(!strcmp(reg,"0")){return "0";}   // check for 0
+    char* ptr;
+    long num = strtol(reg,&ptr,10); // convert to int
+    if(num==0){return "ERROR";}      // if not possible num=0;
+    if(num>0&&num<=208&&num%8==0){return reg;}  // check if actual reg number
 }
