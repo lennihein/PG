@@ -127,7 +127,7 @@ pid_t init_tracee(char *str)    // todo: revise
     // so only the syscalls from the original
     // process are shown    
     // skipped syscalls are sys_rt_sigprocmask and sys_execve
-    for(int i = 0; i < 5; i++) 
+    for(int i = 0; i < 3; i++) 
     {
         ptrace(PTRACE_SYSCALL, pid, 0,0);
         waitpid(pid, &status, 0);

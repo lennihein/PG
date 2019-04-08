@@ -79,24 +79,34 @@ void cli_routine(char* target)
         if(!strcmp(reg,"ERROR"))
         {
             printf("not a register\n");
+            free(reg);
             goto loop;
         }
         uint64_t result = peek_reg(sock, reg);
         printf("%s: %lu\n",reg, result);
+        free(reg);
         goto loop;
     }
     if(!strcmp(input,"POKE_REG")) //poke_reg
     {
         char* reg = malloc(sizeof(char)*8);
-        uint64_t data;
+        char* data = malloc(sizeof(char)*21);
         printf("Type the register you want to overwrite\n");
         scanf("%s", reg);
         convert(reg);                   //lower to upper case
         strcpy(reg,convertreg(reg));    //char* to int
+        if(!strcmp(reg,"ERROR"))
+        {
+            printf("not a register\n");
+            free(reg);
+            goto loop;
+        }
         printf("Type the data you want to overwrite\n");
-        scanf("%lu", &data);
+        scanf("%s", data);
         poke_reg(sock, reg, data);
         printf("Poke succesful\n");
+        free(reg);
+        free(data);
         goto loop;
 
     }
@@ -112,20 +122,23 @@ void cli_routine(char* target)
         char* addr = malloc(sizeof(char)*20);
         printf("Type the address you want to overwrite\n");
         scanf("%s",addr);
-        uint64_t result = peek_reg(sock,addr);
+        uint64_t result = peek_addr(sock,addr);
         printf("%s: %lu\n",addr, result);
+        free(addr);
         goto loop;
     }
     if(!strcmp(input, "POKE_ADDRESS")) //poke_addr
     {
         char* addr = malloc(sizeof(char)*20);
-        uint64_t data;
+        char* data = malloc(sizeof(char)*21);
         printf("Type the adress you want to overwrite\n");
         scanf("%s", addr);
         printf("Type the data you want to overwrite\n");
-        scanf("%lu", &data);
+        scanf("%s", data);
         poke_reg(sock, addr, data);
         printf("Poke succesful\n");
+        free(addr);
+        free(data);
         goto loop;
     }
     if(!strcmp(input, "RAISE_SIGNAL"))      //raise signal
@@ -183,6 +196,7 @@ void cli_routine(char* target)
         if(!strcmp("EXIT",string))    // next_syscall reached end
         {
             zsock_destroy(&sock);
+            free(string);
             free(input);
             return;  
         }
@@ -314,7 +328,7 @@ uint64_t peek_addr(zsock_t* sock, char* addr)
     return erg;
 }
 
-void poke_reg(zsock_t* sock, char* reg, uint64_t data)
+void poke_reg(zsock_t* sock, char* reg, char* data)
 {
     int err = zstr_send(sock, "POKE_REG");
     assert(err!=-1);
@@ -322,23 +336,22 @@ void poke_reg(zsock_t* sock, char* reg, uint64_t data)
     err = zstr_send(sock, reg);
     assert(err!=-1);
     string = zstr_recv(sock);
-    err = zstr_send(sock, (char*)data);
+    err = zstr_send(sock, data);
     assert(err!=-1);
     string = zstr_recv(sock);
-    string=cutoff(string);
     free(string);
 
 }
 
-void poke_addr(zsock_t* sock, uint64_t addr, uint64_t data)
+void poke_addr(zsock_t* sock, char* addr, char* data)
 {
     int err = zstr_send(sock, "POKE_ADDRESS");
     assert(err!=-1);
     char* string = zstr_recv(sock);
-    err = zstr_send(sock, (char*)addr);
+    err = zstr_send(sock, addr);
     assert(err!=-1);
     string = zstr_recv(sock);
-    err = zstr_send(sock, (char*)data);
+    err = zstr_send(sock, data);
     assert(err!=-1);
     string = zstr_recv(sock);
     string=cutoff(string);
