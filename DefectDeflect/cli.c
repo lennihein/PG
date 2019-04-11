@@ -56,8 +56,6 @@ void cli_routine(char* target)
     
     char* input = malloc(sizeof(char)*26);
 
-    loop:
-   
     printf("\n=================================================\n\n");
     printf("Type one of the following options:\n");
     printf("continue, exit,\n");
@@ -65,10 +63,23 @@ void cli_routine(char* target)
     printf("create_breakpoint, remove_breakpoint, show_breakpoints,\n");
     printf("singlestep, next_syscall,\n");
     printf("view_stack, inject_instructions, raise_signal\n\n");
+    printf("'help' for list of commands\n");
 
+    loop:
+    printf("\n");
     scanf("%25s", input);
     convert(input);
-
+    if(!strcmp(input,"HELP"))
+    {
+        printf("\n=================================================\n\n");
+        printf("Type one of the following options:\n");
+        printf("continue, exit,\n");
+        printf("peek_reg, poke_reg, peek_address, poke_address,\n");
+        printf("create_breakpoint, remove_breakpoint, show_breakpoints,\n");
+        printf("singlestep, next_syscall,\n");
+        printf("view_stack, inject_instructions, raise_signal\n\n");
+        goto loop;
+    }
     if(!strcmp(input,"PEEK_REG")) //peek_reg
     {
         char* reg = malloc(sizeof(char)*9);
@@ -180,7 +191,7 @@ void cli_routine(char* target)
     }
     if(!strcmp(input, "SINGLESTEP"))    // singlestep
     {
-        if("EXIT"==singlestep(sock))    // singlestep reached end
+        if(!strcmp("EXIT",singlestep(sock)))    // singlestep reached end
         {
             zsock_destroy(&sock);
             free(input);
@@ -228,9 +239,18 @@ void cli_routine(char* target)
         printf("instructions injected\n");
         goto loop;
     }
+    if(!strcmp(input,"TEST"))
+    {
+        char* string = malloc(sizeof(char)*10);
+        string = func_continue(sock);
+        printf("%s,%s\n",input,string);
+        printf("executed\n");
+        goto loop;
+    }
     if(!strcmp(input, "CONTINUE"))
     {
-        char* string=func_continue(sock);
+        char* string = malloc(sizeof(char)*10);
+        string=func_continue(sock);
         if(!strcmp(string, "EXIT"))    // reached end of code
         {
             free(string);
