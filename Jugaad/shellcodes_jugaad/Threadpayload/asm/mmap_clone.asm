@@ -34,25 +34,26 @@ section .text
 
 
 _start:
-	lea rdi,[rel thread_funk] ;setzte pointer auf payload funktion auf rdi für clone
+	lea rdi,[rel thread_funk]
 	;lea rax,rip
 	;lea	rdi,[rax+0x47]
-	jmp short thread_create1
+	call thread_create1
+	int3
 
 	
 
 
 thread_create1:
-	push rdi ;speicher diesen auf den Stack,damit ungestört mmap syscall ausgeführt werden kann
-	jmp short get_stack
+	push rdi
+	call get_stack
 
 thread_create2:
-	lea rsi,[rax + STACK_SIZE - 8];set childstack at bottom of the 
-	pop qword [rsi];pop pointer for child_funktion from stack
+	lea rsi,[rax + STACK_SIZE - 8]
+	pop qword [rsi]
 	mov rdi, CLONE_THREAD|CLONE_VM|CLONE_SIGHAND
 	mov	rax, SYS_clone
 	syscall
-	int3;breakpoint abbruch bedingung
+	ret
 
 
 
@@ -64,10 +65,11 @@ get_stack:
 	;r8 und r9 sind für jugaad nicht relevant ->r8 wäre fd=-1 und r9 ist offset=0
 	mov	rax, SYS_mmap
 	syscall
-	jmp short thread_create2 ;nach mmap spring zum syscall clone
+	nop
+	ret
 	
 thread_funk:
-		jmp short MainPayload ;printf Halloworld
+		jmp short MainPayload
 		str:	db "Hello World", 10
 		str_len	equ $ -str
 		
@@ -77,8 +79,7 @@ MainPayload:
 		lea rsi,[rel str]
 		mov rdx,str_len
 		syscall
-		jmp short MainPayload ;pointer to start of payload funktion -> payload wird so häufig ausgeführt bis stack keinen platzt mehr hat
 		
-.exit	mov rdi,0;exit syscall falls paiload funktion nicht unendlich
+.exit	mov rdi,0
 		mov rax,60
 		syscall
