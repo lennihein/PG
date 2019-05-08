@@ -312,7 +312,7 @@ char* func_continue(zsock_t* sock)
     char* string = zstr_recv(sock);
     return string;
 }
-uint64_t peek_reg(zsock_t* sock, char* reg) /
+uint64_t peek_reg(zsock_t* sock, char* reg)
 {
     int err = zstr_send(sock, "PEEK_REG");
     assert(err!=-1);
@@ -321,7 +321,7 @@ uint64_t peek_reg(zsock_t* sock, char* reg) /
     assert(err!=-1);
     string = zstr_recv(sock);
     assert(string);
-    string=cutoff(string);
+    string = cutoff(string);
     uint64_t erg = strtoull(string, NULL, 10);
     free(string);
     return erg;
