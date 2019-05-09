@@ -7,19 +7,6 @@ section .data
 section .text
 global _start
 
-func:
-    push rbp
-    mov rbp, rsp
-    mov rax, 0x10
-    push rax
-    mov rax, 0x15
-    push rax
-    mov rax, 0x1
-    push rax
-    mov rsp, rbp
-    pop rbp
-    ret
-
 _start:
 
     ; sys_write
@@ -28,8 +15,6 @@ _start:
     mov RSI, str   
     mov RDX, 12     
     syscall
-
-    call func
 
     ; sys_exit
     mov RAX, 60

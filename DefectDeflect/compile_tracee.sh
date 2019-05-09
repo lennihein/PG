@@ -1,1 +1,1 @@
-nasm -f elf64 -g -F stabs test_tracee.asm && ld -o tracee test_tracee.o 
+nasm -f elf64 -g -F stabs test_tracee.asm && ld -o tracee test_tracee.o && objdump --source --demangle --disassemble -M intel tracee > dump

@@ -1,0 +1,24 @@
+
+tracee:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+00000000004000b0 <_start>:
+global _start
+
+_start:
+
+    ; sys_write
+    mov RAX, 1
+  4000b0:	b8 01 00 00 00       	mov    eax,0x1
+  4000b5:	bf 01 00 00 00       	mov    edi,0x1
+    mov RDI, 1          ; stdout
+  4000ba:	48 be d8 00 60 00 00 	movabs rsi,0x6000d8
+  4000c1:	00 00 00 
+    mov RSI, str   
+  4000c4:	ba 0c 00 00 00       	mov    edx,0xc
+  4000c9:	0f 05                	syscall 
+  4000cb:	b8 3c 00 00 00       	mov    eax,0x3c
+  4000d0:	bf 00 00 00 00       	mov    edi,0x0
+  4000d5:	0f 05                	syscall 
