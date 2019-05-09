@@ -32,8 +32,8 @@ int main(int argc, char **argv)
         // pipe stdout and stderr into logfile
         FILE* log = fopen("log.log", "w");
         int fd = fileno(log);   
-        close(fileno(stdout));  // closing stdout
-        dup(fd);                // stdout now redirects to log.log
+        // close(fileno(stdout));  // closing stdout
+        // dup(fd);                // stdout now redirects to log.log
         close(fileno(stderr));  // closing stderr
         dup(fd);                // stderr now redirects to log.log
         // can we close the stream?

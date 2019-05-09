@@ -61,7 +61,7 @@ int main()
     }
     else
     {
-        printf("> %s\n", command_str);
+        // printf("> %s\n", command_str);
         // execute command
         ((void (*)(zsock_t*, pid_t))command)(sock, pid);
     }
