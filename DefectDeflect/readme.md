@@ -24,7 +24,7 @@ In directory /DefectDeflect run the following command to start debugging <TARGET
 
     ./cli <TARGET>
 
-### utilize 
+### utilise 
 
 Once the cli is exectued it will run the debugger.
 Messages sent to the cli will be redirected to the debugger and then executed.
